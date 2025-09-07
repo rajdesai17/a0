@@ -47,7 +47,7 @@
 
 ## Setup
 
-```bash
+\`\`\`bash
 npm install
 # add GOOGLE_GENERATIVE_AI_API_KEY to .env.local
 npm run dev
