@@ -20,7 +20,7 @@
 - professional ui using origin ui  
 
 ### Component Generation
-- ai generates react + typescript components  
+- ai generates react + typescript components
 - origin ui design patterns (not shadcn)  
 - multiple component types: pricing cards, forms, buttons, modals  
 - clean typed code with proper interfaces  
