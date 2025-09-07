@@ -4,6 +4,13 @@
 
 **Tech Stack**: Next.js 15 + AI SDK v5 + Google Gemini 2.5 Pro + Origin UI + CodeMirror 6
 
+<table>
+  <tr>
+    <td><img width="100%" alt="image" src="https://github.com/user-attachments/assets/6c2d2c96-03a8-4960-acfe-347ca53fc274" /></td>
+    <td><img width="100%" alt="image" src="https://github.com/user-attachments/assets/a176259f-aa0c-4bbf-bab0-dde792081f2b" /></td>
+  </tr>
+</table>
+
 ## Completed Features (v1)
 
 ### Core Chat Interface
