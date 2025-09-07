@@ -5,6 +5,14 @@
 [![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/rajs-projects-a7283d3f/v0-split-screen-chat)
 [![Built with v0](https://img.shields.io/badge/Built%20with-v0.app-black?style=for-the-badge)](https://v0.app/chat/projects/ljsQFGIOA1X)
 
+## Tech Stack
+
+- **AI SDK v5** - Latest AI SDK for seamless AI integration
+- **Gemini 2.0 Flash** - Google's advanced language model
+- **Next.js 14** - React framework with App Router
+- **Tailwind CSS** - Utility-first CSS framework
+- **TypeScript** - Type-safe JavaScript development
+
 ## Overview
 
 This repository will stay in sync with your deployed chats on [v0.app](https://v0.app).
