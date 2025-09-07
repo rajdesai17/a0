@@ -39,7 +39,7 @@ export default function LandingPage() {
         <div className="max-w-4xl mx-auto">
           <Badge variant="secondary" className="mb-6">
             <Sparkles className="w-3 h-3 mr-1" />
-            Powered by Google Gemini 2.5 Flash
+            Powered by Google Gemini 2.5 Flash and ai-sdk
           </Badge>
           <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6 text-balance">
             AI-powered React components in <span className="text-primary">seconds</span>
