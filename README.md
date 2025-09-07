@@ -1,30 +1,46 @@
-# Split screen chat
+# AI Chat Interface - Component Generator
 
-*Automatically synced with your [v0.app](https://v0.app) deployments*
+## Status: Version 1 Complete ✅
 
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/rajs-projects-a7283d3f/v0-split-screen-chat)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.app-black?style=for-the-badge)](https://v0.app/chat/projects/ljsQFGIOA1X)
+**Tech Stack**: Next.js 15 + AI SDK v5 + Google Gemini 2.5 Pro + Origin UI + CodeMirror 6
 
-## Overview
+## Completed Features (v1)
 
-This repository will stay in sync with your deployed chats on [v0.app](https://v0.app).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.app](https://v0.app).
+### Core Chat Interface
+- split-screen design with chat + preview  
+- real-time streaming responses from gemini 2.5 pro  
+- message history with persistent conversations  
+- professional ui using origin ui  
 
-## Deployment
+### Component Generation
+- ai generates react + typescript components  
+- origin ui design patterns (not shadcn)  
+- multiple component types: pricing cards, forms, buttons, modals  
+- clean typed code with proper interfaces  
 
-Your project is live at:
+### Preview System
+- live component preview in sandboxed iframe  
+- codemirror syntax highlighting  
+- preview | code tab system  
+- auto-switch to preview when ready  
 
-**[https://vercel.com/rajs-projects-a7283d3f/v0-split-screen-chat](https://vercel.com/rajs-projects-a7283d3f/v0-split-screen-chat)**
+### Performance
+- response time around 3–11 seconds  
+- smooth streaming and real-time updates  
+- tested with cards, forms, buttons, modals  
 
-## Build your app
+## In Progress (v2)
 
-Continue building your app on:
+- export components as .tsx  
+- usage docs tab with instructions  
+- enhanced export options  
+- browsing tool for api docs  
+- multi-api integration (billingSDK + dodoPayments example)  
+- step-by-step integration instructions  
 
-**[https://v0.app/chat/projects/ljsQFGIOA1X](https://v0.app/chat/projects/ljsQFGIOA1X)**
+## Setup
 
-## How It Works
-
-1. Create and modify your project using [v0.app](https://v0.app)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
+```bash
+npm install
+# add GOOGLE_GENERATIVE_AI_API_KEY to .env.local
+npm run dev
