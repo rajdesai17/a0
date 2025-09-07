@@ -235,7 +235,7 @@ export function SandboxedPreview({ code }: SandboxedPreviewProps) {
           <p className="text-sm text-destructive font-mono">{error}</p>
         </div>
       )}
-      <iframe ref={iframeRef} className="w-full h-full border-0" sandbox="allow-scripts" title="Component Preview" />
+      <iframe ref={iframeRef} className="w-full h-full border-0" sandbox="allow-scripts allow-same-origin" title="Component Preview" />
     </Card>
   )
 }

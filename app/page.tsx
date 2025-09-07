@@ -12,7 +12,7 @@ import { oneDark } from "@codemirror/theme-one-dark"
 import { EditorView } from "@codemirror/view"
 import { useTheme } from "next-themes"
 import { SandboxedPreview } from "@/components/sandboxed-preview"
-import { useChat } from "ai/react"
+import { useChat } from "@ai-sdk/react"
 
 interface Message {
   id: string
@@ -22,16 +22,25 @@ interface Message {
 }
 
 export default function SplitScreenChat() {
-  const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
+  const { messages, input, handleInputChange, handleSubmit, isLoading, error } = useChat({
     api: "/api/chat",
     onFinish: (message) => {
-      // Extract code from the AI response
-      const codeMatch = message.content.match(/```(?:tsx?|javascript|jsx)?\n([\s\S]*?)\n```/)
+      // Extract code from the AI response - fix for AI SDK v5
+      const textContent = (message as any).content || '';
+      const codeMatch = textContent.match(/```(?:tsx?|javascript|jsx)?\n([\s\S]*?)\n```/)
       if (codeMatch) {
-        window.default = new Function(codeMatch[1])()
+        setGeneratedCode(codeMatch[1])
       }
     },
+    onError: (error) => {
+      console.error("Chat error:", error)
+    },
   })
+
+  // Debug logging
+  console.log("Input value:", input)
+  console.log("Input length:", input?.length)
+  console.log("Button disabled:", isLoading || !input?.trim())
 
   const [generatedCode, setGeneratedCode] = useState(`function WelcomeComponent() {
   return (
@@ -82,9 +91,16 @@ window.default = WelcomeComponent;`)
                     message.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
                   }`}
                 >
-                  <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+                  <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                    {/* AI SDK v5 compatible content extraction */}
+                    {(message as any).content || 
+                     (message as any).parts?.map((part: any) => 
+                       part.type === 'text' ? part.text : ''
+                     ).join('') || 
+                     'Loading...'}
+                  </p>
                   <p className="text-xs opacity-70 mt-1">
-                    {new Date(message.createdAt || Date.now()).toLocaleTimeString()}
+                    {new Date().toLocaleTimeString()}
                   </p>
                 </div>
               </div>
@@ -103,6 +119,13 @@ window.default = WelcomeComponent;`)
           </div>
         </ScrollArea>
 
+        {/* Error Display */}
+        {error && (
+          <div className="p-4 bg-destructive/10 border-t border-destructive/20">
+            <p className="text-sm text-destructive">Error: {error.message}</p>
+          </div>
+        )}
+
         {/* Input */}
         <div className="p-4 border-t border-border">
           <form onSubmit={handleSubmit} className="flex gap-2">
@@ -113,7 +136,11 @@ window.default = WelcomeComponent;`)
               className="flex-1"
               disabled={isLoading}
             />
-            <Button type="submit" disabled={isLoading || !input.trim()}>
+            <Button 
+              type="submit" 
+              disabled={isLoading || !input?.trim()}
+              title={!input?.trim() ? "Type a message first" : "Send message"}
+            >
               <Send className="w-4 h-4" />
             </Button>
           </form>

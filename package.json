@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@ai-sdk/google": "latest",
+    "@ai-sdk/react": "^2.0.34",
     "@babel/runtime": "latest",
     "@codemirror/lang-javascript": "latest",
     "@codemirror/state": "latest",
