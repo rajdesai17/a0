@@ -12,6 +12,7 @@ export function SandboxedPreview({ code }: SandboxedPreviewProps) {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    console.log('SandboxedPreview: Code updated:', code) // Debug log
     if (!iframeRef.current) return
 
     const iframe = iframeRef.current
