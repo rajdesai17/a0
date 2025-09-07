@@ -239,7 +239,10 @@ export default ${componentName}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-primary" />
-              <h1 className="font-semibold text-foreground">AI Assistant</h1>
+              <div>
+                <h1 className="font-semibold text-foreground">AI Assistant</h1>
+                <p className="text-sm text-muted-foreground">Component Generator with Gemini 2.0</p>
+              </div>
             </div>
             <Button variant="ghost" size="sm" asChild>
               <Link href="/landing">
@@ -248,7 +251,6 @@ export default ${componentName}
               </Link>
             </Button>
           </div>
-          <p className="text-sm text-muted-foreground">Component Generator with Gemini 2.0</p>
         </div>
 
         {/* Messages */}
@@ -312,8 +314,12 @@ export default ${componentName}
       <div className="w-1/2 flex flex-col">
         {/* Preview Header */}
         <div className="p-4 border-b border-border bg-card">
-          <h2 className="font-semibold text-foreground">Component Preview</h2>
-          <p className="text-sm text-muted-foreground">Live preview and code editor</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="font-semibold text-foreground">Component Preview</h2>
+              <p className="text-sm text-muted-foreground">Live preview and code editor</p>
+            </div>
+          </div>
         </div>
 
         {/* Tabs */}
