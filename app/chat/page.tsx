@@ -236,7 +236,12 @@ export default ${componentName}
       <div className="w-1/2 flex flex-col border-r border-border">
         {/* Chat Header */}
         <div className="p-4 border-b border-border bg-card">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/landing">
+                <ArrowLeft className="w-4 h-4" />
+              </Link>
+            </Button>
             <div className="flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-primary" />
               <div>
@@ -244,12 +249,6 @@ export default ${componentName}
                 <p className="text-sm text-muted-foreground">Component Generator with Gemini 2.0</p>
               </div>
             </div>
-            <Button variant="ghost" size="sm" asChild>
-              <Link href="/landing">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back
-              </Link>
-            </Button>
           </div>
         </div>
 
