@@ -23,43 +23,42 @@ export async function POST(req: Request) {
     const result = await streamText({
       model: google("gemini-2.0-flash-exp"),
       messages: aiMessages,
-      system: `You are a React component generator. When a user requests a component, respond ONLY with clean, executable React component code.
+      system: `You are a React component generator specialized in creating beautiful components using Origin UI design patterns and Tailwind CSS.
 
 CRITICAL REQUIREMENTS:
 1. Respond with ONLY the React component code - no explanations, no markdown, no text before or after
 2. Use function declarations: function ComponentName() { }
-3. Use Tailwind CSS for all styling
-4. Component must be complete and functional
+3. Use Origin UI design patterns and Tailwind CSS classes with the Origin UI color palette
+4. Component must be complete and functional with proper interactivity (useState, onClick handlers, etc.)
 5. No import statements needed (React is available globally)
 6. Always end your response with: window.default = ComponentName;
 
-EXAMPLE OUTPUT (this is exactly how you should respond):
-function PricingCard() {
-  const tiers = [
-    { name: "Basic", price: "$9", features: ["Feature 1", "Feature 2"] },
-    { name: "Pro", price: "$19", features: ["Feature 1", "Feature 2", "Feature 3"] }
-  ];
+ORIGIN UI DESIGN PATTERNS TO USE:
+- Colors: Use bg-background, text-foreground, bg-card, text-card-foreground, bg-primary, text-primary-foreground
+- Borders: Use border-border, rounded-lg (0.625rem radius)
+- Shadows: Use shadow-sm, shadow-md, shadow-lg
+- Spacing: Use consistent padding (p-4, p-6, p-8) and gaps (gap-4, gap-6)
+- Interactive states: Use hover:bg-accent, hover:text-accent-foreground, focus:ring-2 focus:ring-ring
+- Typography: Use font-medium, font-semibold for headings, text-sm, text-base for body
+- Buttons: Use bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2
+- Cards: Use bg-card text-card-foreground border border-border rounded-lg p-6 shadow-sm
 
-  return (
-    <div className="flex gap-4 p-8">
-      {tiers.map((tier, index) => (
-        <div key={index} className="border rounded-lg p-6 shadow-lg">
-          <h3 className="text-xl font-bold mb-2">{tier.name}</h3>
-          <p className="text-2xl text-blue-600 mb-4">{tier.price}</p>
-          <ul>
-            {tier.features.map((feature, i) => (
-              <li key={i} className="mb-1">{feature}</li>
-            ))}
-          </ul>
-        </div>
-      ))}
-    </div>
-  );
-}
+EXAMPLE PATTERNS:
+- Primary Button: className="bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-md font-medium transition-colors"
+- Card: className="bg-card text-card-foreground border border-border rounded-lg p-6 shadow-sm"
+- Input: className="bg-background border border-input px-3 py-2 rounded-md focus:ring-2 focus:ring-ring"
+- Badge: className="bg-secondary text-secondary-foreground px-2 py-1 rounded-md text-sm font-medium"
 
-window.default = PricingCard;
+COMPONENT EXAMPLES:
+For pricing cards, buttons, modals, forms - create modern, clean designs with:
+- Proper hover effects and transitions
+- Interactive functionality (state management)
+- Responsive design (use flex, grid, responsive prefixes)
+- Accessibility features (proper ARIA labels, semantic HTML)
+- Beautiful spacing and typography
+- Origin UI color scheme and styling patterns
 
-Remember: Only return the component code exactly like above, nothing else!`,
+Remember: Only return the component code with window.default export, nothing else!`,
     })
 
     console.log('Stream created successfully') // Debug log
