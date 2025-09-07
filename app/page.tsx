@@ -284,7 +284,7 @@ export default ${componentName}
   }
 
   return (
-    <div className="h-screen flex bg-background">
+    <div className="h-screen flex bg-background overflow-hidden">
       {/* Left Panel - Chat */}
       <div className="w-1/2 flex flex-col border-r border-border">
         {/* Chat Header */}
@@ -364,8 +364,8 @@ export default ${componentName}
         </div>
 
         {/* Tabs */}
-        <Tabs value={selectedTab} onValueChange={setSelectedTab} className="flex-1 flex flex-col">
-          <div className="px-4 pt-4 pb-0">
+        <Tabs value={selectedTab} onValueChange={setSelectedTab} className="flex-1 flex flex-col overflow-hidden">
+          <div className="px-4 pt-4 pb-0 flex-shrink-0">
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="preview" className="flex items-center gap-2">
                 <Eye className="w-4 h-4" />
@@ -382,11 +382,11 @@ export default ${componentName}
             </TabsList>
           </div>
 
-          <TabsContent value="preview" className="flex-1 p-4 pt-2">
+          <TabsContent value="preview" className="flex-1 p-4 pt-2 overflow-hidden">
             <SandboxedPreview code={generatedCode} />
           </TabsContent>
 
-          <TabsContent value="code" className="flex-1 p-4 pt-2 flex flex-col">
+          <TabsContent value="code" className="flex-1 p-4 pt-2 flex flex-col overflow-hidden">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-sm font-medium text-muted-foreground">Component Code</h3>
               <div className="flex items-center gap-2">
@@ -417,110 +417,112 @@ export default ${componentName}
             </Card>
           </TabsContent>
 
-          <TabsContent value="instructions" className="flex-1 p-4 pt-2">
-            <Card className="h-full p-6 overflow-auto">
-              <div className="prose prose-sm max-w-none text-foreground leading-relaxed">
-                <ReactMarkdown
-                  components={{
-                    h1: ({ children }) => (
-                      <h1 className="text-2xl font-bold text-foreground mb-4 mt-0 border-b border-border pb-2">
-                        {children}
-                      </h1>
-                    ),
-                    h2: ({ children }) => (
-                      <h2 className="text-xl font-semibold text-foreground mb-3 mt-6 first:mt-0">
-                        {children}
-                      </h2>
-                    ),
-                    h3: ({ children }) => (
-                      <h3 className="text-lg font-medium text-foreground mb-2 mt-4">
-                        {children}
-                      </h3>
-                    ),
-                    p: ({ children }) => (
-                      <p className="text-foreground mb-4 leading-relaxed">
-                        {children}
-                      </p>
-                    ),
-                    ul: ({ children }) => (
-                      <ul className="list-none space-y-2 mb-4 pl-0">
-                        {children}
-                      </ul>
-                    ),
-                    ol: ({ children }) => (
-                      <ol className="list-decimal space-y-2 mb-4 pl-6 marker:text-primary">
-                        {children}
-                      </ol>
-                    ),
-                    li: ({ children }) => (
-                      <li className="flex items-start gap-2 text-foreground">
-                        <span className="text-primary mt-1 text-sm">•</span>
-                        <span className="flex-1">{children}</span>
-                      </li>
-                    ),
-                    strong: ({ children }) => (
-                      <strong className="font-semibold text-foreground">
-                        {children}
-                      </strong>
-                    ),
-                    code: ({ children, className }) => {
-                      const isInline = !className;
-                      return isInline ? (
-                        <code className="bg-muted text-foreground px-1.5 py-0.5 rounded text-sm font-mono border">
+          <TabsContent value="instructions" className="flex-1 p-4 pt-2 overflow-hidden">
+            <Card className="h-full overflow-hidden">
+              <div className="h-full overflow-y-auto scrollbar-hide p-6">
+                <div className="prose prose-sm max-w-none text-foreground leading-relaxed">
+                  <ReactMarkdown
+                    components={{
+                      h1: ({ children }) => (
+                        <h1 className="text-2xl font-bold text-foreground mb-4 mt-0 border-b border-border pb-2">
                           {children}
-                        </code>
-                      ) : (
-                        <code className={className}>{children}</code>
-                      );
-                    },
-                    pre: ({ children, ...props }) => {
-                      const child = children as any;
-                      const className = child?.props?.className || '';
-                      const match = /language-(\w+)/.exec(className);
-                      const language = match ? match[1] : 'javascript';
-                      
-                      return (
-                        <div className="mb-4 mt-2">
-                          <SyntaxHighlighter
-                            style={theme === 'dark' ? syntaxOneDark : syntaxOneLight}
-                            language={language}
-                            customStyle={{
-                              margin: 0,
-                              borderRadius: '0.5rem',
-                              backgroundColor: theme === 'dark' ? 'hsl(var(--muted))' : 'hsl(var(--muted))',
-                              border: '1px solid hsl(var(--border))',
-                              fontSize: '0.875rem',
-                              lineHeight: '1.5',
-                            }}
-                            {...props}
-                          >
-                            {String(child?.props?.children || '').replace(/\n$/, '')}
-                          </SyntaxHighlighter>
-                        </div>
-                      );
-                    },
-                    a: ({ children, href }) => (
-                      <a 
-                        href={href} 
-                        className="text-primary hover:text-primary/80 underline underline-offset-2"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {children}
-                      </a>
-                    ),
-                    hr: () => (
-                      <hr className="my-6 border-border" />
-                    ),
-                    blockquote: ({ children }) => (
-                      <blockquote className="border-l-4 border-primary pl-4 italic text-muted-foreground my-4">
-                        {children}
-                      </blockquote>
-                    ),
-                  }}
-                >
-                  {generateInstructions(generatedCode)}
-                </ReactMarkdown>
+                        </h1>
+                      ),
+                      h2: ({ children }) => (
+                        <h2 className="text-xl font-semibold text-foreground mb-3 mt-6 first:mt-0">
+                          {children}
+                        </h2>
+                      ),
+                      h3: ({ children }) => (
+                        <h3 className="text-lg font-medium text-foreground mb-2 mt-4">
+                          {children}
+                        </h3>
+                      ),
+                      p: ({ children }) => (
+                        <p className="text-foreground mb-4 leading-relaxed">
+                          {children}
+                        </p>
+                      ),
+                      ul: ({ children }) => (
+                        <ul className="list-none space-y-2 mb-4 pl-0">
+                          {children}
+                        </ul>
+                      ),
+                      ol: ({ children }) => (
+                        <ol className="list-decimal space-y-2 mb-4 pl-6 marker:text-primary">
+                          {children}
+                        </ol>
+                      ),
+                      li: ({ children }) => (
+                        <li className="flex items-start gap-2 text-foreground">
+                          <span className="text-primary mt-1 text-sm">•</span>
+                          <span className="flex-1">{children}</span>
+                        </li>
+                      ),
+                      strong: ({ children }) => (
+                        <strong className="font-semibold text-foreground">
+                          {children}
+                        </strong>
+                      ),
+                      code: ({ children, className }) => {
+                        const isInline = !className;
+                        return isInline ? (
+                          <code className="bg-muted text-foreground px-1.5 py-0.5 rounded text-sm font-mono border">
+                            {children}
+                          </code>
+                        ) : (
+                          <code className={className}>{children}</code>
+                        );
+                      },
+                      pre: ({ children, ...props }) => {
+                        const child = children as any;
+                        const className = child?.props?.className || '';
+                        const match = /language-(\w+)/.exec(className);
+                        const language = match ? match[1] : 'javascript';
+                        
+                        return (
+                          <div className="mb-4 mt-2">
+                            <SyntaxHighlighter
+                              style={theme === 'dark' ? syntaxOneDark : syntaxOneLight}
+                              language={language}
+                              customStyle={{
+                                margin: 0,
+                                borderRadius: '0.5rem',
+                                backgroundColor: theme === 'dark' ? 'hsl(var(--muted))' : 'hsl(var(--muted))',
+                                border: '1px solid hsl(var(--border))',
+                                fontSize: '0.875rem',
+                                lineHeight: '1.5',
+                              }}
+                              {...props}
+                            >
+                              {String(child?.props?.children || '').replace(/\n$/, '')}
+                            </SyntaxHighlighter>
+                          </div>
+                        );
+                      },
+                      a: ({ children, href }) => (
+                        <a 
+                          href={href} 
+                          className="text-primary hover:text-primary/80 underline underline-offset-2"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {children}
+                        </a>
+                      ),
+                      hr: () => (
+                        <hr className="my-6 border-border" />
+                      ),
+                      blockquote: ({ children }) => (
+                        <blockquote className="border-l-4 border-primary pl-4 italic text-muted-foreground my-4">
+                          {children}
+                        </blockquote>
+                      ),
+                    }}
+                  >
+                    {generateInstructions(generatedCode)}
+                  </ReactMarkdown>
+                </div>
               </div>
             </Card>
           </TabsContent>
