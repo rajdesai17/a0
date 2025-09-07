@@ -45,59 +45,6 @@ window.default = WelcomeComponent;`)
   const { theme } = useTheme()
   const [selectedTab, setSelectedTab] = useState("preview")
 
-  // Function to extract and update code from AI response
-  const tryExtractCode = (content: string) => {
-    // Try multiple regex patterns to catch different code block formats
-    const patterns = [
-      /```(?:tsx?|typescript|javascript|jsx)?\n([\s\S]*?)\n```/,
-      /```\n([\s\S]*?)\n```/,
-      /```([\s\S]*?)```/
-    ]
-    
-    for (const pattern of patterns) {
-      const match = content.match(pattern)
-      if (match) {
-        let extractedCode = match[1].trim()
-        console.log('Raw extracted code:', extractedCode) // Debug log
-        
-        // Only update if we have meaningful code (not just comments or imports)
-        if (extractedCode.includes('function') || extractedCode.includes('const') || extractedCode.includes('return')) {
-          
-          // Ensure the code has proper React imports and export
-          let finalCode = extractedCode
-          
-          // Add React imports if not present
-          if (!finalCode.includes('import React') && !finalCode.includes('from "react"')) {
-            // For UMD React (browser), we don't need imports
-            finalCode = finalCode
-          }
-          
-          // Extract component name from the code
-          let componentName = 'GeneratedComponent'
-          const functionMatch = finalCode.match(/function\s+(\w+)/)
-          const constMatch = finalCode.match(/const\s+(\w+)\s*=/)
-          
-          if (functionMatch) {
-            componentName = functionMatch[1]
-          } else if (constMatch) {
-            componentName = constMatch[1]
-          }
-          
-          // Ensure proper export
-          if (!finalCode.includes('window.default')) {
-            finalCode += `\n\n// Export as default for the preview\nwindow.default = ${componentName};`
-          }
-          
-          console.log('Final processed code:', finalCode) // Debug log
-          console.log('Component name:', componentName) // Debug log
-          
-          setGeneratedCode(finalCode)
-          break
-        }
-      }
-    }
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!input.trim()) return
@@ -115,13 +62,22 @@ window.default = WelcomeComponent;`)
     setMessages(prev => [...prev, newMessage])
     setInput("")
 
+    // Add a generating status message
+    const statusMessage: Message = {
+      id: (Date.now() + 1).toString(),
+      role: "assistant",
+      content: "🎨 Generating your component...",
+      timestamp: new Date(),
+    }
+    setMessages(prev => [...prev, statusMessage])
+
     try {
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
+      body: JSON.stringify({
           messages: [...messages, newMessage],
         }),
       })
@@ -133,92 +89,74 @@ window.default = WelcomeComponent;`)
       const reader = response.body?.getReader()
       if (!reader) throw new Error("No response body")
 
-      let assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: "assistant",
-        content: "",
-        timestamp: new Date(),
-      }
-
-      setMessages(prev => [...prev, assistantMessage])
-
-      // Read the stream
+      // Read the entire stream as component code
       const decoder = new TextDecoder()
-      let buffer = ''
+      let fullCode = ''
       
       while (true) {
         const { done, value } = await reader.read()
         if (done) break
 
         const chunk = decoder.decode(value, { stream: true })
-        buffer += chunk
-        
-        const lines = buffer.split('\n')
-        buffer = lines.pop() || '' // Keep incomplete line in buffer
-        
-        for (const line of lines) {
-          if (line.trim()) {
-            console.log('Received line:', line) // Debug log
-            
-            // Handle different streaming formats
-            if (line.startsWith('0:')) {
-              // AI SDK v5 text stream format
-              const data = line.slice(2)
-              if (data) {
-                assistantMessage.content += data
-                setMessages(prev => 
-                  prev.map(msg => 
-                    msg.id === assistantMessage.id ? { ...assistantMessage } : msg
-                  )
-                )
-                
-                // Try to extract code in real-time
-                tryExtractCode(assistantMessage.content)
-              }
-            } else if (line.startsWith('data: ')) {
-              // SSE format
-              const data = line.slice(6)
-              if (data !== '[DONE]') {
-                try {
-                  const parsed = JSON.parse(data)
-                  if (parsed.content) {
-                    assistantMessage.content += parsed.content
-                    setMessages(prev => 
-                      prev.map(msg => 
-                        msg.id === assistantMessage.id ? { ...assistantMessage } : msg
-                      )
-                    )
-                    
-                    // Try to extract code in real-time
-                    tryExtractCode(assistantMessage.content)
-                  }
-                } catch (e) {
-                  console.error("Error parsing SSE data:", e)
-                }
-              }
-            } else {
-              // Try as plain text
-              assistantMessage.content += line
-              setMessages(prev => 
-                prev.map(msg => 
-                  msg.id === assistantMessage.id ? { ...assistantMessage } : msg
-                )
-              )
-              
-              // Try to extract code in real-time
-              tryExtractCode(assistantMessage.content)
-            }
-          }
-        }
+        fullCode += chunk
       }
 
-      // Final code extraction attempt
-      console.log('Final content:', assistantMessage.content) // Debug log
-      tryExtractCode(assistantMessage.content)
+      console.log('Received full code:', fullCode)
+
+      // Clean up the code and set it directly
+      let cleanCode = fullCode.trim()
+      
+      // Remove any markdown code blocks if present
+      cleanCode = cleanCode.replace(/```(?:jsx?|tsx?|javascript|typescript)?\n?/g, '')
+      cleanCode = cleanCode.replace(/```/g, '')
+      
+      // Add window.default export if not present
+      if (!cleanCode.includes('window.default')) {
+        // Try to detect component name
+        const functionMatch = cleanCode.match(/function\s+(\w+)/)
+        const componentName = functionMatch ? functionMatch[1] : 'Component'
+        cleanCode += `\n\n// Export as default for the preview\nwindow.default = ${componentName};`
+      }
+
+      console.log('Final processed code:', cleanCode)
+      
+      // Set the generated code directly to preview
+      setGeneratedCode(cleanCode)
+      
+      // Update status message to success
+      const successMessage: Message = {
+        id: statusMessage.id,
+        role: "assistant",
+        content: "✅ Component generated successfully! Check the preview →",
+        timestamp: new Date(),
+      }
+      
+      setMessages(prev => 
+        prev.map(msg => 
+          msg.id === statusMessage.id ? successMessage : msg
+        )
+      )
+      
+      // Auto-switch to preview tab
+      setSelectedTab("preview")
 
     } catch (err) {
-      console.error("Chat error:", err)
+      console.error("Error:", err)
       setError(err instanceof Error ? err.message : "An error occurred")
+      
+      // Update status message to error
+      const errorMessage: Message = {
+        id: statusMessage.id,
+        role: "assistant",
+        content: "❌ Error generating component. Please try again.",
+        timestamp: new Date(),
+      }
+      
+      setMessages(prev => 
+        prev.map(msg => 
+          msg.id === statusMessage.id ? errorMessage : msg
+        )
+      )
     } finally {
       setIsLoading(false)
     }

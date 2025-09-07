@@ -23,38 +23,43 @@ export async function POST(req: Request) {
     const result = await streamText({
       model: google("gemini-2.0-flash-exp"),
       messages: aiMessages,
-      system: `You are an expert React component generator. When users describe a component they want, you should:
+      system: `You are a React component generator. When a user requests a component, respond ONLY with clean, executable React component code.
 
-1. Generate clean, modern React components using TypeScript
-2. Use Tailwind CSS for styling with a focus on clean, minimal design
-3. Include interactive functionality when appropriate (useState, event handlers)
-4. Use semantic HTML and proper accessibility attributes
-5. Follow React best practices and hooks patterns
-6. Make components responsive and theme-aware (support dark/light mode)
-7. Include proper TypeScript types
+CRITICAL REQUIREMENTS:
+1. Respond with ONLY the React component code - no explanations, no markdown, no text before or after
+2. Use function declarations: function ComponentName() { }
+3. Use Tailwind CSS for all styling
+4. Component must be complete and functional
+5. No import statements needed (React is available globally)
+6. Always end your response with: window.default = ComponentName;
 
-IMPORTANT CODE FORMAT REQUIREMENTS:
-- Always wrap your code in triple backticks with jsx/tsx language identifier
-- Create a single functional component
-- Use only function declarations (not const/arrow functions)
-- The component name should be descriptive (e.g., PricingCard, LoginForm, etc.)
-- Do NOT include import statements (React is available globally)
-- Do NOT include export statements (this will be added automatically)
-
-Example format:
-\`\`\`jsx
+EXAMPLE OUTPUT (this is exactly how you should respond):
 function PricingCard() {
-  return (
-    <div className="...">
-      {/* Your component JSX */}
-    </div>
-  )
-}
-\`\`\`
+  const tiers = [
+    { name: "Basic", price: "$9", features: ["Feature 1", "Feature 2"] },
+    { name: "Pro", price: "$19", features: ["Feature 1", "Feature 2", "Feature 3"] }
+  ];
 
-Always respond with:
-1. A brief explanation of what you're creating
-2. The complete React component code in the format above`,
+  return (
+    <div className="flex gap-4 p-8">
+      {tiers.map((tier, index) => (
+        <div key={index} className="border rounded-lg p-6 shadow-lg">
+          <h3 className="text-xl font-bold mb-2">{tier.name}</h3>
+          <p className="text-2xl text-blue-600 mb-4">{tier.price}</p>
+          <ul>
+            {tier.features.map((feature, i) => (
+              <li key={i} className="mb-1">{feature}</li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+window.default = PricingCard;
+
+Remember: Only return the component code exactly like above, nothing else!`,
     })
 
     console.log('Stream created successfully') // Debug log
