@@ -180,13 +180,13 @@ importers:
         specifier: ^7.60.0
         version: 7.60.0(react@18.0.0)
       react-markdown:
-        specifier: ^10.1.0
+        specifier: latest
         version: 10.1.0(@types/react@18.0.0)(react@18.0.0)
       react-resizable-panels:
         specifier: ^2.1.7
         version: 2.1.7(react-dom@18.0.0(react@18.0.0))(react@18.0.0)
       react-syntax-highlighter:
-        specifier: ^15.6.6
+        specifier: latest
         version: 15.6.6(react@18.0.0)
       recharts:
         specifier: 2.15.4
