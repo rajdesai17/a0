@@ -1,8 +1,8 @@
 "use client"
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { ArrowRight, Sparkles, Code, Eye, Zap, Github, Download } from "lucide-react"
+import { Button } from "@/components/origin-ui/button"
+import { Card } from "@/components/origin-ui/card"
+import { Badge } from "@/components/origin-ui/badge"
+import { ArrowRight, Sparkles, Code, Eye, Zap, Github, Download, Terminal, FileText, Layers, Smartphone } from "lucide-react"
 import Link from "next/link"
 
 export default function LandingPage() {
@@ -19,14 +19,14 @@ export default function LandingPage() {
           </div>
           <div className="flex items-center gap-3">
             <Button variant="ghost" size="sm" asChild>
-              <Link href="https://github.com" target="_blank">
+              <Link href="https://github.com/rajdesai17/a0" target="_blank">
                 <Github className="w-4 h-4 mr-2" />
-                GitHub
+                View Repo
               </Link>
             </Button>
             <Button asChild>
               <Link href="/chat">
-                Get Started
+                Try Demo
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Link>
             </Button>
@@ -36,27 +36,39 @@ export default function LandingPage() {
 
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-16 text-center">
-        <div className="max-w-3xl mx-auto">
-          <Badge variant="secondary" className="mb-4">
+        <div className="max-w-4xl mx-auto">
+          <Badge variant="secondary" className="mb-6">
             <Sparkles className="w-3 h-3 mr-1" />
-            Powered by Google Gemini 2.0
+            Powered by Google Gemini 2.5 Flash
           </Badge>
           <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6 text-balance">
-            Generate React Components with <span className="text-primary">AI</span>
+            AI-powered React components in <span className="text-primary">seconds</span>
           </h1>
-          <p className="text-xl text-muted-foreground mb-8 text-pretty max-w-2xl mx-auto">
-            Create beautiful, functional React components instantly using natural language. Built with Origin UI,
-            TypeScript, and Tailwind CSS.
+          <p className="text-xl text-muted-foreground mb-8 text-pretty max-w-3xl mx-auto">
+            Chat, browse docs, and generate production-ready components — fast, clean, and previewed live.
           </p>
+          
+          {/* Tech Stack */}
+          <div className="flex flex-wrap justify-center gap-2 mb-8">
+            <Badge variant="outline">Next.js 15</Badge>
+            <Badge variant="outline">AI SDK v5</Badge>
+            <Badge variant="outline">Google Gemini 2.5 Flash</Badge>
+            <Badge variant="outline">Origin UI</Badge>
+            <Badge variant="outline">CodeMirror 6</Badge>
+          </div>
+
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" asChild>
               <Link href="/chat">
-                Start Creating
+                Try Demo
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Link>
             </Button>
             <Button size="lg" variant="outline" asChild>
-              <Link href="#features">Learn More</Link>
+              <Link href="https://github.com/rajdesai17/v0-split-screen-chaty" target="_blank">
+                <Github className="w-4 h-4 mr-2" />
+                View Repo
+              </Link>
             </Button>
           </div>
         </div>
@@ -65,20 +77,40 @@ export default function LandingPage() {
       {/* Features Section */}
       <section id="features" className="container mx-auto px-4 py-16">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-foreground mb-4">Everything you need to build components</h2>
+          <h2 className="text-3xl font-bold text-foreground mb-4">Features</h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Professional-grade tools and AI-powered generation for modern React development
+            Everything you need to build modern React components with AI
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
           <Card className="p-6 text-center">
             <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
               <Sparkles className="w-6 h-6 text-primary" />
             </div>
-            <h3 className="font-semibold text-foreground mb-2">AI-Powered Generation</h3>
+            <h3 className="font-semibold text-foreground mb-2">Real-time Streaming Chat</h3>
             <p className="text-muted-foreground text-sm">
-              Describe your component in natural language and watch AI create it instantly with Google Gemini 2.0
+              Interactive chat with Gemini for instant component generation and refinement
+            </p>
+          </Card>
+
+          <Card className="p-6 text-center">
+            <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
+              <Terminal className="w-6 h-6 text-primary" />
+            </div>
+            <h3 className="font-semibold text-foreground mb-2">Typed React + TypeScript</h3>
+            <p className="text-muted-foreground text-sm">
+              Generate fully typed React components with proper TypeScript interfaces
+            </p>
+          </Card>
+
+          <Card className="p-6 text-center">
+            <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
+              <Layers className="w-6 h-6 text-primary" />
+            </div>
+            <h3 className="font-semibold text-foreground mb-2">Origin UI Styling</h3>
+            <p className="text-muted-foreground text-sm">
+              Beautiful, consistent UI with Origin UI design tokens and components
             </p>
           </Card>
 
@@ -88,17 +120,7 @@ export default function LandingPage() {
             </div>
             <h3 className="font-semibold text-foreground mb-2">Live Preview</h3>
             <p className="text-muted-foreground text-sm">
-              See your components come to life in real-time with our sandboxed preview environment
-            </p>
-          </Card>
-
-          <Card className="p-6 text-center">
-            <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
-              <Code className="w-6 h-6 text-primary" />
-            </div>
-            <h3 className="font-semibold text-foreground mb-2">Clean Code</h3>
-            <p className="text-muted-foreground text-sm">
-              Get production-ready TypeScript components with Origin UI styling and best practices
+              Sandboxed iframe preview with Code | Preview tabs for instant feedback
             </p>
           </Card>
 
@@ -106,9 +128,19 @@ export default function LandingPage() {
             <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
               <Download className="w-6 h-6 text-primary" />
             </div>
-            <h3 className="font-semibold text-foreground mb-2">Export Ready</h3>
+            <h3 className="font-semibold text-foreground mb-2">Export Components</h3>
             <p className="text-muted-foreground text-sm">
-              Download your components as .tsx files with proper imports and documentation
+              Download as .tsx files with proper imports and production-ready code
+            </p>
+          </Card>
+
+          <Card className="p-6 text-center">
+            <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
+              <FileText className="w-6 h-6 text-primary" />
+            </div>
+            <h3 className="font-semibold text-foreground mb-2">Usage Docs Tab</h3>
+            <p className="text-muted-foreground text-sm">
+              Step-by-step instructions and documentation for each component
             </p>
           </Card>
 
@@ -116,21 +148,19 @@ export default function LandingPage() {
             <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
               <Zap className="w-6 h-6 text-primary" />
             </div>
-            <h3 className="font-semibold text-foreground mb-2">Lightning Fast</h3>
+            <h3 className="font-semibold text-foreground mb-2">Multi-API Integration</h3>
             <p className="text-muted-foreground text-sm">
-              Generate components in seconds with streaming responses and instant feedback
+              Examples with billingSDK + dodoPayments for real-world usage
             </p>
           </Card>
 
           <Card className="p-6 text-center">
             <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
-              <div className="w-6 h-6 bg-primary rounded-sm flex items-center justify-center">
-                <span className="text-primary-foreground text-xs font-bold">UI</span>
-              </div>
+              <Smartphone className="w-6 h-6 text-primary" />
             </div>
-            <h3 className="font-semibold text-foreground mb-2">Origin UI</h3>
+            <h3 className="font-semibold text-foreground mb-2">Polished UI/UX</h3>
             <p className="text-muted-foreground text-sm">
-              Built with Origin UI components for beautiful, accessible, and consistent design
+              Responsive, professional interface designed for developer productivity
             </p>
           </Card>
         </div>
@@ -141,14 +171,22 @@ export default function LandingPage() {
         <Card className="p-8 md:p-12 text-center bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
           <h2 className="text-3xl font-bold text-foreground mb-4">Ready to build amazing components?</h2>
           <p className="text-muted-foreground text-lg mb-8 max-w-2xl mx-auto">
-            Join developers who are already using AI to accelerate their React development workflow
+            Start generating production-ready React components with AI in seconds
           </p>
-          <Button size="lg" asChild>
-            <Link href="/chat">
-              Start Creating Now
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Link>
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button size="lg" asChild>
+              <Link href="/chat">
+                Try Demo
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Link>
+            </Button>
+            <Button size="lg" variant="outline" asChild>
+              <Link href="https://github.com/rajdesai17/v0-split-screen-chaty" target="_blank">
+                <Github className="w-4 h-4 mr-2" />
+                View Repo
+              </Link>
+            </Button>
+          </div>
         </Card>
       </section>
 
@@ -163,9 +201,9 @@ export default function LandingPage() {
               <span className="text-sm text-muted-foreground">AI Component Generator</span>
             </div>
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
-              <span>Built with Origin UI & Next.js</span>
+              <span>Built with Next.js 15 & Origin UI</span>
               <span>•</span>
-              <span>Powered by Google Gemini</span>
+              <span>Powered by Google Gemini 2.5 Flash</span>
             </div>
           </div>
         </div>
