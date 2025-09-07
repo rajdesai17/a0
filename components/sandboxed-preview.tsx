@@ -34,39 +34,44 @@ export function SandboxedPreview({ code }: SandboxedPreviewProps) {
       theme: {
         extend: {
           colors: {
-            border: "hsl(var(--border))",
-            input: "hsl(var(--input))",
-            ring: "hsl(var(--ring))",
-            background: "hsl(var(--background))",
-            foreground: "hsl(var(--foreground))",
+            border: "var(--border)",
+            input: "var(--input)",
+            ring: "var(--ring)",
+            background: "var(--background)",
+            foreground: "var(--foreground)",
             primary: {
-              DEFAULT: "hsl(var(--primary))",
-              foreground: "hsl(var(--primary-foreground))",
+              DEFAULT: "var(--primary)",
+              foreground: "var(--primary-foreground)",
             },
             secondary: {
-              DEFAULT: "hsl(var(--secondary))",
-              foreground: "hsl(var(--secondary-foreground))",
+              DEFAULT: "var(--secondary)",
+              foreground: "var(--secondary-foreground)",
             },
             destructive: {
-              DEFAULT: "hsl(var(--destructive))",
-              foreground: "hsl(var(--destructive-foreground))",
+              DEFAULT: "var(--destructive)",
+              foreground: "var(--destructive-foreground)",
             },
             muted: {
-              DEFAULT: "hsl(var(--muted))",
-              foreground: "hsl(var(--muted-foreground))",
+              DEFAULT: "var(--muted)",
+              foreground: "var(--muted-foreground)",
             },
             accent: {
-              DEFAULT: "hsl(var(--accent))",
-              foreground: "hsl(var(--accent-foreground))",
+              DEFAULT: "var(--accent)",
+              foreground: "var(--accent-foreground)",
             },
             popover: {
-              DEFAULT: "hsl(var(--popover))",
-              foreground: "hsl(var(--popover-foreground))",
+              DEFAULT: "var(--popover)",
+              foreground: "var(--popover-foreground)",
             },
             card: {
-              DEFAULT: "hsl(var(--card))",
-              foreground: "hsl(var(--card-foreground))",
+              DEFAULT: "var(--card)",
+              foreground: "var(--card-foreground)",
             },
+          },
+          borderRadius: {
+            lg: "var(--radius)",
+            md: "calc(var(--radius) - 2px)",
+            sm: "calc(var(--radius) - 4px)",
           },
         },
       },
@@ -74,47 +79,48 @@ export function SandboxedPreview({ code }: SandboxedPreviewProps) {
   </script>
   <style>
     :root {
-      --background: 0 0% 100%;
-      --foreground: 222.2 84% 4.9%;
-      --card: 0 0% 100%;
-      --card-foreground: 222.2 84% 4.9%;
-      --popover: 0 0% 100%;
-      --popover-foreground: 222.2 84% 4.9%;
-      --primary: 221.2 83.2% 53.3%;
-      --primary-foreground: 210 40% 98%;
-      --secondary: 210 40% 96%;
-      --secondary-foreground: 222.2 84% 4.9%;
-      --muted: 210 40% 96%;
-      --muted-foreground: 215.4 16.3% 46.9%;
-      --accent: 210 40% 96%;
-      --accent-foreground: 222.2 84% 4.9%;
-      --destructive: 0 84.2% 60.2%;
-      --destructive-foreground: 210 40% 98%;
-      --border: 214.3 31.8% 91.4%;
-      --input: 214.3 31.8% 91.4%;
-      --ring: 221.2 83.2% 53.3%;
+      --radius: 0.625rem;
+      --background: oklch(1 0 0);
+      --foreground: oklch(0.141 0.005 285.823);
+      --card: oklch(1 0 0);
+      --card-foreground: oklch(0.141 0.005 285.823);
+      --popover: oklch(1 0 0);
+      --popover-foreground: oklch(0.141 0.005 285.823);
+      --primary: oklch(0.21 0.006 285.885);
+      --primary-foreground: oklch(0.985 0 0);
+      --secondary: oklch(0.967 0.001 286.375);
+      --secondary-foreground: oklch(0.21 0.006 285.885);
+      --muted: oklch(0.967 0.001 286.375);
+      --muted-foreground: oklch(0.552 0.016 285.938);
+      --accent: oklch(0.967 0.001 286.375);
+      --accent-foreground: oklch(0.21 0.006 285.885);
+      --destructive: oklch(0.637 0.237 25.331);
+      --destructive-foreground: oklch(0.637 0.237 25.331);
+      --border: oklch(0.92 0.004 286.32);
+      --input: oklch(0.871 0.006 286.286);
+      --ring: oklch(0.871 0.006 286.286);
     }
     
     .dark {
-      --background: 222.2 84% 4.9%;
-      --foreground: 210 40% 98%;
-      --card: 222.2 84% 4.9%;
-      --card-foreground: 210 40% 98%;
-      --popover: 222.2 84% 4.9%;
-      --popover-foreground: 210 40% 98%;
-      --primary: 217.2 91.2% 59.8%;
-      --primary-foreground: 222.2 84% 4.9%;
-      --secondary: 217.2 32.6% 17.5%;
-      --secondary-foreground: 210 40% 98%;
-      --muted: 217.2 32.6% 17.5%;
-      --muted-foreground: 215 20.2% 65.1%;
-      --accent: 217.2 32.6% 17.5%;
-      --accent-foreground: 210 40% 98%;
-      --destructive: 0 62.8% 30.6%;
-      --destructive-foreground: 210 40% 98%;
-      --border: 217.2 32.6% 17.5%;
-      --input: 217.2 32.6% 17.5%;
-      --ring: 224.3 76.3% 94.1%;
+      --background: oklch(0.141 0.005 285.823);
+      --foreground: oklch(0.985 0 0);
+      --card: oklch(0.141 0.005 285.823);
+      --card-foreground: oklch(0.985 0 0);
+      --popover: oklch(0.141 0.005 285.823);
+      --popover-foreground: oklch(0.985 0 0);
+      --primary: oklch(0.985 0 0);
+      --primary-foreground: oklch(0.21 0.006 285.885);
+      --secondary: oklch(0.274 0.006 286.033);
+      --secondary-foreground: oklch(0.985 0 0);
+      --muted: oklch(0.21 0.006 285.885);
+      --muted-foreground: oklch(0.65 0.01 286);
+      --accent: oklch(0.21 0.006 285.885);
+      --accent-foreground: oklch(0.985 0 0);
+      --destructive: oklch(0.396 0.141 25.723);
+      --destructive-foreground: oklch(0.637 0.237 25.331);
+      --border: oklch(0.274 0.006 286.033);
+      --input: oklch(0.274 0.006 286.033);
+      --ring: oklch(0.442 0.017 285.786);
     }
     
     body {
