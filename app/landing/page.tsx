@@ -83,12 +83,12 @@ export default function LandingPage() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+        <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
           <Card className="p-6 text-center">
             <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
               <Sparkles className="w-6 h-6 text-primary" />
             </div>
-            <h3 className="font-semibold text-foreground mb-2">Real-time Streaming Chat</h3>
+            <h3 className="font-semibold text-foreground mb-2">Real-time Component Generation</h3>
             <p className="text-muted-foreground text-sm">
               Interactive chat with Gemini for instant component generation and refinement
             </p>
@@ -98,19 +98,9 @@ export default function LandingPage() {
             <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
               <Terminal className="w-6 h-6 text-primary" />
             </div>
-            <h3 className="font-semibold text-foreground mb-2">Typed React + TypeScript</h3>
+            <h3 className="font-semibold text-foreground mb-2">React + TypeScript + Origin UI</h3>
             <p className="text-muted-foreground text-sm">
-              Generate fully typed React components with proper TypeScript interfaces
-            </p>
-          </Card>
-
-          <Card className="p-6 text-center">
-            <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
-              <Layers className="w-6 h-6 text-primary" />
-            </div>
-            <h3 className="font-semibold text-foreground mb-2">Origin UI Styling</h3>
-            <p className="text-muted-foreground text-sm">
-              Beautiful, consistent UI with Origin UI design tokens and components
+              Clean, typed code with Origin UI design tokens and TypeScript interfaces
             </p>
           </Card>
 
@@ -118,7 +108,7 @@ export default function LandingPage() {
             <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
               <Eye className="w-6 h-6 text-primary" />
             </div>
-            <h3 className="font-semibold text-foreground mb-2">Live Preview</h3>
+            <h3 className="font-semibold text-foreground mb-2">Live Preview with Code | Preview Tabs</h3>
             <p className="text-muted-foreground text-sm">
               Sandboxed iframe preview with Code | Preview tabs for instant feedback
             </p>
@@ -128,39 +118,9 @@ export default function LandingPage() {
             <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
               <Download className="w-6 h-6 text-primary" />
             </div>
-            <h3 className="font-semibold text-foreground mb-2">Export Components</h3>
+            <h3 className="font-semibold text-foreground mb-2">Download with Usage Docs</h3>
             <p className="text-muted-foreground text-sm">
-              Download as .tsx files with proper imports and production-ready code
-            </p>
-          </Card>
-
-          <Card className="p-6 text-center">
-            <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
-              <FileText className="w-6 h-6 text-primary" />
-            </div>
-            <h3 className="font-semibold text-foreground mb-2">Usage Docs Tab</h3>
-            <p className="text-muted-foreground text-sm">
-              Step-by-step instructions and documentation for each component
-            </p>
-          </Card>
-
-          <Card className="p-6 text-center">
-            <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
-              <Zap className="w-6 h-6 text-primary" />
-            </div>
-            <h3 className="font-semibold text-foreground mb-2">Multi-API Integration</h3>
-            <p className="text-muted-foreground text-sm">
-              Examples with billingSDK + dodoPayments for real-world usage
-            </p>
-          </Card>
-
-          <Card className="p-6 text-center">
-            <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
-              <Smartphone className="w-6 h-6 text-primary" />
-            </div>
-            <h3 className="font-semibold text-foreground mb-2">Polished UI/UX</h3>
-            <p className="text-muted-foreground text-sm">
-              Responsive, professional interface designed for developer productivity
+              Download with usage docs and crawler-based integration guide
             </p>
           </Card>
         </div>
