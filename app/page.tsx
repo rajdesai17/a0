@@ -5,13 +5,16 @@ import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Send, Code, Eye, Sparkles } from "lucide-react"
+import { Send, Code, Eye, Sparkles, Download, FileText } from "lucide-react"
 import CodeMirror from "@uiw/react-codemirror"
 import { javascript } from "@codemirror/lang-javascript"
 import { oneDark } from "@codemirror/theme-one-dark"
 import { EditorView } from "@codemirror/view"
 import { useTheme } from "next-themes"
 import { SandboxedPreview } from "@/components/sandboxed-preview"
+import ReactMarkdown from "react-markdown"
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
+import { oneDark as syntaxOneDark, oneLight as syntaxOneLight } from "react-syntax-highlighter/dist/esm/styles/prism"
 
 interface Message {
   id: string
@@ -25,6 +28,7 @@ export default function SplitScreenChat() {
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [downloadSuccess, setDownloadSuccess] = useState(false)
   
   const [generatedCode, setGeneratedCode] = useState(`function WelcomeComponent() {
   return (
@@ -44,6 +48,119 @@ window.default = WelcomeComponent;`)
 
   const { theme } = useTheme()
   const [selectedTab, setSelectedTab] = useState("preview")
+
+  // Extract component name from code
+  const extractComponentName = (code: string): string => {
+    const functionMatch = code.match(/function\s+(\w+)/)
+    const constMatch = code.match(/const\s+(\w+)\s*=/)
+    return functionMatch?.[1] || constMatch?.[1] || 'Component'
+  }
+
+  // Generate component instructions
+  const generateInstructions = (code: string): string => {
+    const componentName = extractComponentName(code)
+    const hasState = code.includes('useState')
+    const hasProps = code.includes('props') || code.includes(': {') || code.includes('interface')
+    const hasInteractivity = code.includes('onClick') || code.includes('onSubmit') || code.includes('onChange')
+    
+    // Extract potential props from the code
+    const propsMatches = code.match(/interface\s+\w+Props[^}]*\}|type\s+\w+Props\s*=[^;]*;/)
+    const stateMatches = code.match(/useState\s*\([^)]*\)/g)
+    const eventMatches = code.match(/on\w+\s*=\s*{[^}]*}/g)
+
+    let instructions = `# ${componentName} Component\n\n`
+    instructions += `## Overview\nA React functional component built with Origin UI design patterns and Tailwind CSS.\n\n`
+    instructions += `## Usage\n\`\`\`jsx\nimport ${componentName} from './${componentName}'\n\nfunction App() {\n  return <${componentName} />\n}\n\`\`\`\n\n`
+    
+    instructions += `## Features\n`
+    instructions += hasState ? `- ✅ **Interactive State Management**: Uses React useState hooks\n` : `- 📋 **Static Component**: No internal state management\n`
+    instructions += hasInteractivity ? `- ✅ **User Interactions**: Includes click handlers and form interactions\n` : `- 📋 **Display Only**: No user interactions\n`
+    instructions += hasProps ? `- ✅ **Configurable Props**: Accepts customizable properties\n` : `- 📋 **Self Contained**: No external props required\n`
+    instructions += `- 🎨 **Origin UI Styled**: Uses beautiful Origin UI design tokens\n`
+    instructions += `- 📱 **Responsive Design**: Mobile-friendly responsive layout\n`
+    instructions += `- 🌙 **Theme Support**: Compatible with dark/light modes\n\n`
+
+    if (propsMatches) {
+      instructions += `## Props Interface\n\`\`\`typescript\n${propsMatches[0]}\n\`\`\`\n\n`
+    } else {
+      instructions += `## Props\nThis component does not require any props and can be used directly.\n\n`
+    }
+
+    if (stateMatches) {
+      instructions += `## State Management\nThis component manages the following state:\n`
+      stateMatches.forEach((match, i) => {
+        instructions += `- **State ${i + 1}**: \`${match}\`\n`
+      })
+      instructions += `\n`
+    }
+
+    if (eventMatches) {
+      instructions += `## Event Handlers\nThe component includes these interactive features:\n`
+      eventMatches.forEach((match, i) => {
+        instructions += `- **Handler ${i + 1}**: \`${match.split('=')[0].trim()}\`\n`
+      })
+      instructions += `\n`
+    }
+
+    instructions += `## Styling\n`
+    instructions += `- Uses **Origin UI** color palette (\`bg-primary\`, \`text-foreground\`, etc.)\n`
+    instructions += `- Implements **Tailwind CSS** utility classes\n`
+    instructions += `- Follows **responsive design** principles\n`
+    instructions += `- Supports **dark/light theme** switching\n\n`
+
+    instructions += `## Dependencies\n`
+    instructions += `- React 18+\n`
+    instructions += `- Tailwind CSS\n`
+    instructions += `- Origin UI design tokens\n\n`
+
+    instructions += `## Customization\n`
+    instructions += `You can customize this component by:\n`
+    instructions += `1. **Modifying colors**: Update Tailwind color classes\n`
+    instructions += `2. **Adjusting spacing**: Change padding/margin classes\n`
+    instructions += `3. **Adding props**: Extend component to accept custom properties\n`
+    instructions += `4. **State enhancement**: Add more useState hooks for additional functionality\n\n`
+
+    instructions += `## Installation\n`
+    instructions += `1. Copy the component code to your project\n`
+    instructions += `2. Ensure Tailwind CSS is configured with Origin UI colors\n`
+    instructions += `3. Import and use in your React application\n\n`
+
+    instructions += `---\n*Generated by AI Component Generator with Origin UI*`
+
+    return instructions
+  }
+
+  // Download component as file
+  const downloadComponent = () => {
+    const componentName = extractComponentName(generatedCode)
+    const filename = `${componentName.replace(/[^a-zA-Z0-9]/g, '')}.tsx`
+    
+    const fileContent = `// ${componentName} Component
+// Generated by AI Component Generator
+// Built with Origin UI and Tailwind CSS
+
+import React from 'react'
+
+${generatedCode.replace(/window\.default\s*=\s*\w+;?\s*$/g, '').trim()}
+
+export default ${componentName}
+`
+
+    const blob = new Blob([fileContent], { type: 'text/typescript' })
+    const url = URL.createObjectURL(blob)
+    
+    const link = document.createElement('a')
+    link.href = url
+    link.download = filename
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+    
+    // Show success feedback
+    setDownloadSuccess(true)
+    setTimeout(() => setDownloadSuccess(false), 2000)
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -249,7 +366,7 @@ window.default = WelcomeComponent;`)
         {/* Tabs */}
         <Tabs value={selectedTab} onValueChange={setSelectedTab} className="flex-1 flex flex-col">
           <div className="px-4 pt-4 pb-0">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="preview" className="flex items-center gap-2">
                 <Eye className="w-4 h-4" />
                 Preview
@@ -258,6 +375,10 @@ window.default = WelcomeComponent;`)
                 <Code className="w-4 h-4" />
                 Code
               </TabsTrigger>
+              <TabsTrigger value="instructions" className="flex items-center gap-2">
+                <FileText className="w-4 h-4" />
+                Instructions
+              </TabsTrigger>
             </TabsList>
           </div>
 
@@ -265,8 +386,27 @@ window.default = WelcomeComponent;`)
             <SandboxedPreview code={generatedCode} />
           </TabsContent>
 
-          <TabsContent value="code" className="flex-1 p-4 pt-2">
-            <Card className="h-full overflow-hidden">
+          <TabsContent value="code" className="flex-1 p-4 pt-2 flex flex-col">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-medium text-muted-foreground">Component Code</h3>
+              <div className="flex items-center gap-2">
+                {downloadSuccess && (
+                  <span className="text-sm text-green-600 dark:text-green-400">
+                    Downloaded successfully!
+                  </span>
+                )}
+                <Button
+                  onClick={downloadComponent}
+                  size="sm"
+                  variant="outline"
+                  className="flex items-center gap-2"
+                >
+                  <Download className="w-4 h-4" />
+                  Download
+                </Button>
+              </div>
+            </div>
+            <Card className="flex-1 overflow-hidden">
               <CodeMirror
                 value={generatedCode}
                 onChange={(value) => setGeneratedCode(value)}
@@ -274,6 +414,114 @@ window.default = WelcomeComponent;`)
                 theme={theme === "dark" ? oneDark : undefined}
                 className="h-full"
               />
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="instructions" className="flex-1 p-4 pt-2">
+            <Card className="h-full p-6 overflow-auto">
+              <div className="prose prose-sm max-w-none text-foreground leading-relaxed">
+                <ReactMarkdown
+                  components={{
+                    h1: ({ children }) => (
+                      <h1 className="text-2xl font-bold text-foreground mb-4 mt-0 border-b border-border pb-2">
+                        {children}
+                      </h1>
+                    ),
+                    h2: ({ children }) => (
+                      <h2 className="text-xl font-semibold text-foreground mb-3 mt-6 first:mt-0">
+                        {children}
+                      </h2>
+                    ),
+                    h3: ({ children }) => (
+                      <h3 className="text-lg font-medium text-foreground mb-2 mt-4">
+                        {children}
+                      </h3>
+                    ),
+                    p: ({ children }) => (
+                      <p className="text-foreground mb-4 leading-relaxed">
+                        {children}
+                      </p>
+                    ),
+                    ul: ({ children }) => (
+                      <ul className="list-none space-y-2 mb-4 pl-0">
+                        {children}
+                      </ul>
+                    ),
+                    ol: ({ children }) => (
+                      <ol className="list-decimal space-y-2 mb-4 pl-6 marker:text-primary">
+                        {children}
+                      </ol>
+                    ),
+                    li: ({ children }) => (
+                      <li className="flex items-start gap-2 text-foreground">
+                        <span className="text-primary mt-1 text-sm">•</span>
+                        <span className="flex-1">{children}</span>
+                      </li>
+                    ),
+                    strong: ({ children }) => (
+                      <strong className="font-semibold text-foreground">
+                        {children}
+                      </strong>
+                    ),
+                    code: ({ children, className }) => {
+                      const isInline = !className;
+                      return isInline ? (
+                        <code className="bg-muted text-foreground px-1.5 py-0.5 rounded text-sm font-mono border">
+                          {children}
+                        </code>
+                      ) : (
+                        <code className={className}>{children}</code>
+                      );
+                    },
+                    pre: ({ children, ...props }) => {
+                      const child = children as any;
+                      const className = child?.props?.className || '';
+                      const match = /language-(\w+)/.exec(className);
+                      const language = match ? match[1] : 'javascript';
+                      
+                      return (
+                        <div className="mb-4 mt-2">
+                          <SyntaxHighlighter
+                            style={theme === 'dark' ? syntaxOneDark : syntaxOneLight}
+                            language={language}
+                            customStyle={{
+                              margin: 0,
+                              borderRadius: '0.5rem',
+                              backgroundColor: theme === 'dark' ? 'hsl(var(--muted))' : 'hsl(var(--muted))',
+                              border: '1px solid hsl(var(--border))',
+                              fontSize: '0.875rem',
+                              lineHeight: '1.5',
+                            }}
+                            {...props}
+                          >
+                            {String(child?.props?.children || '').replace(/\n$/, '')}
+                          </SyntaxHighlighter>
+                        </div>
+                      );
+                    },
+                    a: ({ children, href }) => (
+                      <a 
+                        href={href} 
+                        className="text-primary hover:text-primary/80 underline underline-offset-2"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {children}
+                      </a>
+                    ),
+                    hr: () => (
+                      <hr className="my-6 border-border" />
+                    ),
+                    blockquote: ({ children }) => (
+                      <blockquote className="border-l-4 border-primary pl-4 italic text-muted-foreground my-4">
+                        {children}
+                      </blockquote>
+                    ),
+                  }}
+                >
+                  {generateInstructions(generatedCode)}
+                </ReactMarkdown>
+              </div>
             </Card>
           </TabsContent>
         </Tabs>
