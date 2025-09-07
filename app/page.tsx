@@ -293,7 +293,7 @@ export default ${componentName}
             <Sparkles className="w-5 h-5 text-primary" />
             <h1 className="font-semibold text-foreground">AI Assistant</h1>
           </div>
-          <p className="text-sm text-muted-foreground">Component Generator with Gemini 2.0</p>
+          <p className="text-sm text-muted-foreground">Component Generator with Gemini 2.5 Flash</p>
         </div>
 
         {/* Messages */}
