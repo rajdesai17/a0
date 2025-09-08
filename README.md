@@ -116,20 +116,10 @@ User Input → URL Detection → Parallel Scraping → Content Analysis → AI G
 - `lib/scrapeUtils.ts` - Web scraping utilities with anti-bot measures
 - `lib/tools/browseTool.ts` - Multi-API browser tool
 
-## Contributing
-
-We welcome contributions! Please feel free to submit issues and pull requests.
-
 ## License
 
 This project is licensed under the MIT License.
 
-## Acknowledgments
-
-- Google AI Studio for Gemini 2.5 Flash API
-- Origin UI for beautiful component library
-- Vercel AI SDK for seamless AI integration
-- Next.js team for the amazing framework
 
 ---
 
