@@ -1,10 +1,25 @@
 # a0 - AI Component Studio
 
-> **📋 For detailed technical implementation and completion analysis, see [PROJECT_COMPLETION_REPORT.md](./PROJECT_COMPLETION_REPORT.md)**
+## 📝 TL;DR
 
-## 🚀 Project Status: 95% Complete ✅
+**a0** is an AI-powered React component generator that creates professional, production-ready components by analyzing multiple API documentations simultaneously. Simply describe what you want or provide documentation URLs, and get a complete component with code, preview, and integration instructions.
 
-**Advanced AI-powered component generation platform with multi-API documentation integration**
+🚀 **Quick Example**: "create a pricing card integrated with https://stripe.com/docs https://supabase.com/docs" → Get a fully integrated component in seconds
+
+---
+
+## 🎯 What is a0?
+
+**a0** (pronounced "a-zero") is an intelligent component generation platform that combines AI with real-time documentation analysis. It's like having a senior developer who can instantly read any API documentation and build you the perfect component.
+
+### Key Features
+
+- 🤖 **AI-Powered Generation**: Uses Google Gemini 2.5 Flash for intelligent component creation
+- 🌐 **Multi-API Integration**: Scrapes multiple documentation sources simultaneously
+- 👀 **Live Preview**: Real-time component preview with split-screen interface
+- 📚 **Smart Documentation**: Auto-generates installation guides and usage instructions
+- 🎨 **Origin UI Design**: Professional, accessible components with modern design
+- ⚡ **Production Ready**: TypeScript, error handling, and best practices built-in
 
 **Tech Stack**: Next.js 14 + AI SDK v5.0.34 + Google Gemini 2.5 Flash + Origin UI + TypeScript
 
@@ -15,13 +30,86 @@
   </tr>
 </table>
 
-## ✨ What Makes This Special
+## 🖼️ Screenshots
 
-**🔗 Multi-API Integration**: First-of-its-kind ability to scrape and integrate multiple documentation sources simultaneously for context-aware component generation.
+<table>
+  <tr>
+    <td><img width="100%" alt="image" src="https://github.com/user-attachments/assets/6c2d2c96-03a8-4960-acfe-347ca53fc274" /></td>
+    <td><img width="100%" alt="image" src="https://github.com/user-attachments/assets/a176259f-aa0c-4bbf-bab0-dde792081f2b" /></td>
+  </tr>
+</table>
 
-**🤖 Advanced AI**: Powered by Google Gemini 2.5 Flash with intelligent documentation analysis and endpoint extraction.
+## 🚀 How It Works
 
-**🎨 Professional Design**: Complete Origin UI integration with "a0" branding system and responsive design.
+1. **Describe Your Component**: Tell a0 what you want to build
+2. **Add Documentation URLs** (optional): Include API docs for integration
+3. **Get Your Component**: Receive code, preview, and instructions instantly
+
+## 💡 Example Usage
+
+```
+"create a pricing card with Stripe integration"
+"build a user dashboard with authentication"
+"design a checkout flow with payment processing"
+"create a data table with Supabase integration"
+```
+
+## 🛠️ Quick Start
+
+### Prerequisites
+
+- Node.js 18+ and pnpm (recommended)
+- Google AI Studio API key
+
+### Installation
+
+```bash
+# Clone and install
+git clone https://github.com/rajdesai17/v0-split-screen-chaty.git
+cd v0-split-screen-chaty
+pnpm install
+
+# Set up environment
+cp .env.example .env.local
+# Add your GOOGLE_GENERATIVE_AI_API_KEY to .env.local
+
+# Run the app
+pnpm dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) and start creating components!
+
+## ⚙️ Environment Setup
+
+Create `.env.local` in the root directory:
+
+```env
+GOOGLE_GENERATIVE_AI_API_KEY=your_api_key_here
+FIRECRAWL_API_KEY=your_firecrawl_key_here # Optional: For enhanced scraping
+```
+
+## 📖 Usage Examples
+
+### Basic Components
+```
+"create a modern pricing card"
+"build a contact form with validation" 
+"design a hero section with call-to-action"
+```
+
+### API-Integrated Components  
+```
+"create a user profile with Supabase authentication"
+"build a payment form integrated with Stripe"
+"design a dashboard with real-time data from Firebase"
+```
+
+### Advanced Components
+```
+"create a multi-step form with progress tracking"
+"build a data visualization dashboard with charts"
+"design a e-commerce product catalog with filtering"
+```
 
 ## 🎯 Core Features
 
@@ -127,65 +215,44 @@ FIRECRAWL_API_KEY=your_firecrawl_key_here # Optional: For enhanced scraping
 "design a checkout flow with payment integration"
 ```
 
-## 📁 Project Structure
+## 🎛️ Features
+
+- **🤖 AI-Powered**: Google Gemini 2.5 Flash generates intelligent, context-aware components
+- **🌐 Multi-API**: Analyze multiple documentation sources simultaneously  
+- **👀 Live Preview**: Real-time component preview with split-screen interface
+- **� Smart Docs**: Auto-generated installation guides and usage instructions
+- **🎨 Professional Design**: Origin UI components with modern styling
+- **⚡ Production Ready**: TypeScript, error handling, and best practices
+- **📱 Responsive**: Works on desktop, tablet, and mobile
+- **🔧 Customizable**: Easy to modify and extend components
+
+## � Project Structure
 
 ```
 a0-component-studio/
-├── app/
-│   ├── chat/page.tsx           # Main chat interface
-│   ├── landing/page.tsx        # Professional landing page
-│   ├── layout.tsx              # Root layout with branding
-│   └── api/
-│       ├── chat/route.ts       # AI chat endpoint
-│       ├── documentation/route.ts # Documentation analysis
-│       └── scrape/route.ts     # Web scraping API
-├── components/
-│   ├── navbar.tsx              # Navigation component
-│   ├── sandboxed-preview.tsx   # Component preview
-│   └── origin-ui/              # Origin UI components
-├── lib/
-│   ├── scrapeUtils.ts          # Web scraping utilities
-│   └── tools/browseTool.ts     # Multi-API browser
-└── README.md                   # This file
+├── app/                    # Next.js app directory
+├── components/             # Reusable UI components  
+├── lib/                    # Utilities and tools
+└── public/                 # Static assets
 ```
-
-## 🔧 Technical Features
-
-- **Multi-API Integration**: Parallel documentation scraping and analysis
-- **AI-Powered Generation**: Google Gemini 2.5 Flash with context awareness
-- **Real-time Preview**: Sandboxed component rendering with live updates
-- **Professional UI**: Origin UI design system with consistent branding
-- **TypeScript**: Full type safety throughout the application
-- **Performance Optimized**: Efficient caching and parallel processing
-
-## 📈 Performance Metrics
-
-- **Component Generation**: 15-30 seconds (depending on complexity)
-- **Multi-API Scraping**: 2-5 seconds parallel processing
-- **Real-time Updates**: Sub-second preview refresh
-- **Memory Efficiency**: Optimized context handling
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+We welcome contributions! Please feel free to submit issues and pull requests.
 
-## 📝 License
+## � License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License.
 
 ## 🙏 Acknowledgments
 
-- **Google AI Studio** for Gemini 2.5 Flash API
-- **Origin UI** for the beautiful component library
-- **Vercel AI SDK** for seamless AI integration
-- **Next.js Team** for the amazing framework
+- Google AI Studio for Gemini 2.5 Flash API
+- Origin UI for beautiful component library
+- Vercel AI SDK for seamless AI integration
+- Next.js team for the amazing framework
 
 ---
 
-**🎯 Built with ❤️ by a0 - AI Component Studio**
+**Built with ❤️ by the a0 team**
 
-> 📋 **For comprehensive technical documentation and implementation details, see [PROJECT_COMPLETION_REPORT.md](./PROJECT_COMPLETION_REPORT.md)**
+> 📋 **For detailed technical documentation, see [PROJECT_COMPLETION_REPORT.md](./PROJECT_COMPLETION_REPORT.md)**
