@@ -22,7 +22,7 @@ export function SandboxedPreview({ code }: SandboxedPreviewProps) {
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
   <title>Component Preview</title>
   <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
@@ -126,14 +126,38 @@ export function SandboxedPreview({ code }: SandboxedPreviewProps) {
     body {
       margin: 0;
       padding: 20px;
-      font-family: system-ui, -apple-system, sans-serif;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
       background: hsl(var(--background));
       color: hsl(var(--foreground));
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      box-sizing: border-box;
+      overflow-y: auto;
+      overflow-x: auto;
+    }
+    
+    #root {
+      width: 100%;
+      max-width: 100%;
+      margin: 0 auto;
+      display: block;
+      box-sizing: border-box;
+      padding: 20px 0;
+    }
+    
+    /* Ensure components scale properly */
+    #root > * {
+      max-width: 100%;
+      margin: 0 auto;
     }
     
     html {
       scrollbar-width: none; /* Firefox */
       -ms-overflow-style: none; /* IE/Edge */
+      box-sizing: border-box;
+      font-size: 16px; /* Ensure proper font scaling */
     }
     
     html::-webkit-scrollbar {
@@ -267,7 +291,10 @@ export function SandboxedPreview({ code }: SandboxedPreviewProps) {
         title="Component Preview"
         style={{
           scrollbarWidth: 'none',
-          msOverflowStyle: 'none'
+          msOverflowStyle: 'none',
+          transform: 'scale(1)',
+          transformOrigin: 'top left',
+          minHeight: '600px'
         }}
       />
     </Card>
