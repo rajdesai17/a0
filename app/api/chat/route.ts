@@ -8,7 +8,7 @@ async function handleAnalysisRequest(messages: any[]) {
     const analysisPrompt = messages[0]?.content || ''
     
     const result = await streamText({
-      model: google("gemini-2.0-flash-exp"),
+      model: google("gemini-2.5-flash"),
       messages: [
         {
           role: "system",
@@ -204,7 +204,7 @@ For pricing cards, buttons, modals, forms - create modern, clean designs with:
 Remember: Only return the component code with window.default export, nothing else!`
 
     const result = await streamText({
-      model: google("gemini-2.0-flash-exp"),
+      model: google("gemini-2.5-flash"),
       messages: aiMessages,
       system: systemPrompt,
     })

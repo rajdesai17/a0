@@ -1029,8 +1029,10 @@ export default ${componentName}
             </TabsList>
           </div>
 
-          <TabsContent value="preview" className="flex-1 p-6 pt-4 overflow-hidden">
-            <SandboxedPreview code={generatedCode} />
+          <TabsContent value="preview" className="flex-1 p-4 overflow-hidden">
+            <div className="h-full w-full">
+              <SandboxedPreview code={generatedCode} />
+            </div>
           </TabsContent>
 
           <TabsContent value="code" className="flex-1 p-6 pt-4 flex flex-col overflow-hidden">
