@@ -1062,13 +1062,15 @@ export default ${componentName}
               </div>
             </div>
             <Card className="flex-1 overflow-hidden rounded-xl border-border/50 shadow-sm">
-              <CodeMirror
-                value={generatedCode}
-                onChange={(value) => setGeneratedCode(value)}
-                extensions={[javascript({ jsx: true }), EditorView.lineWrapping]}
-                theme={theme === "dark" ? oneDark : undefined}
-                className="h-full"
-              />
+              <div className="h-full overflow-y-auto scrollbar-hide">
+                <CodeMirror
+                  value={generatedCode}
+                  onChange={(value) => setGeneratedCode(value)}
+                  extensions={[javascript({ jsx: true }), EditorView.lineWrapping]}
+                  theme={theme === "dark" ? oneDark : undefined}
+                  className="h-full"
+                />
+              </div>
             </Card>
           </TabsContent>
 
