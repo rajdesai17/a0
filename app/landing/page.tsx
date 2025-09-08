@@ -19,13 +19,13 @@ export default function LandingPage() {
             <span className="font-semibold text-lg text-foreground">AI Component Generator</span>
           </div>
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="sm" className="rounded-full" asChild>
+            <Button variant="ghost" size="sm" asChild>
               <Link href="https://github.com/rajdesai17/a0" target="_blank">
                 <Github className="w-4 h-4 mr-2" />
                 View Repo
               </Link>
             </Button>
-            <Button className="rounded-full" asChild>
+            <Button asChild>
               <Link href="/chat">
                 Try Demo
                 <ArrowRight className="w-4 h-4 ml-2" />
