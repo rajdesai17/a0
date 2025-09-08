@@ -2,10 +2,61 @@ import { streamText } from "ai"
 import { google } from "@ai-sdk/google"
 import { browseTool } from "@/lib/tools/browseTool"
 
+// Handle analysis requests for contextual documentation analysis
+async function handleAnalysisRequest(messages: any[]) {
+  try {
+    const analysisPrompt = messages[0]?.content || ''
+    
+    const result = await streamText({
+      model: google("gemini-2.0-flash-exp"),
+      messages: [
+        {
+          role: "system",
+          content: `You are an expert API integration assistant. Analyze the provided API documentation and user request to generate focused, practical integration instructions.
+
+Your response should be structured markdown that includes:
+
+1. **RELEVANT ENDPOINTS** - Only list the 3-5 most relevant endpoints for the user's specific use case
+2. **QUICK START** - Step-by-step instructions specific to their request  
+3. **CODE EXAMPLES** - Working code examples for the most important endpoints
+4. **AUTHENTICATION** - What auth is needed (if any) with examples
+5. **KEY CONCEPTS** - Important concepts they need to understand
+6. **COMMON GOTCHAS** - Things to watch out for
+
+Focus on being concise and practical. Don't repeat endpoint information - only show what they actually need for their specific use case.`
+        },
+        {
+          role: "user", 
+          content: analysisPrompt
+        }
+      ]
+    })
+
+    let analysisResult = ''
+    for await (const textPart of result.textStream) {
+      analysisResult += textPart
+    }
+
+    return new Response(analysisResult, {
+      headers: { 'Content-Type': 'text/plain' }
+    })
+
+  } catch (error) {
+    console.error('Analysis error:', error)
+    return new Response('Analysis failed', { status: 500 })
+  }
+}
+
 export async function POST(req: Request) {
   try {
-    const { messages } = await req.json()
+    const { messages, analysis } = await req.json()
     console.log('Received messages:', messages) // Debug log
+
+    // Handle analysis requests differently
+    if (analysis) {
+      console.log('Analysis request detected')
+      return await handleAnalysisRequest(messages)
+    }
 
     // Transform messages to the format expected by the AI SDK
     const aiMessages = messages
@@ -78,11 +129,15 @@ CRITICAL REQUIREMENTS:
 4. Component must be complete and functional with proper interactivity (useState, onClick handlers, etc.)
 5. No import statements needed (React is available globally)
 6. Always end your response with: window.default = ComponentName;
-7. **INCLUDE API INTEGRATION** - Use fetch() calls to integrate with the documented APIs
-8. Add proper error handling, loading states, and TypeScript interfaces for API responses
-9. **ADD COMMENTS** in your code indicating which API endpoints are being used and what they do
+7. **INCLUDE REALISTIC API INTEGRATION** - Use fetch() calls with proper error handling
+8. Add proper error handling, loading states, and realistic data structures
+9. **ADD COMMENTS** in your code indicating API integration points
 10. **NO EXTERNAL ASSETS** - Do not reference external fonts, images, or stylesheets. Use only Tailwind classes and system fonts
-11. Use absolute URLs for any API calls (e.g., https://api.example.com/endpoint not /api/endpoint)
+11. Use realistic API endpoints and data structures
+12. Include form validation and user feedback
+13. Create working demo functionality even without real API connections
+14. **NO TYPESCRIPT SYNTAX** - Use plain JavaScript, avoid type annotations like interface or type definitions
+15. Use catch (error) not catch (e: any) for error handling
 
 ORIGIN UI DESIGN PATTERNS TO USE:
 - Colors: Use bg-background, text-foreground, bg-card, text-card-foreground, bg-primary, text-primary-foreground
