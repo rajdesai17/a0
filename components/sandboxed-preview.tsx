@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { Card } from "@/components/ui/card"
+import { Card } from "@/components/origin-ui/card"
 
 interface SandboxedPreviewProps {
   code: string

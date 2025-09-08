@@ -2,11 +2,11 @@
 import { useState, useEffect } from "react"
 import type React from "react"
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { Button } from "@/components/origin-ui/button"
+import { Input } from "@/components/origin-ui/input"
+import { Card } from "@/components/origin-ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/origin-ui/tabs"
+import { ScrollArea } from "@/components/origin-ui/scroll-area"
 import { Send, Code, Eye, Sparkles, Download, FileText, Github, ArrowRight } from "lucide-react"
 import CodeMirror from "@uiw/react-codemirror"
 import { javascript } from "@codemirror/lang-javascript"
@@ -194,7 +194,7 @@ Focus only on what's needed for this specific use case. Be concise and practical
     instructions += `### What You'll Need\n`
     instructions += `- ✅ React 18+ project (Next.js, Vite, Create React App)\n`
     instructions += `- ✅ Tailwind CSS configured\n`
-    instructions += `- ✅ Origin UI components (or shadcn/ui)\n\n`
+    instructions += `- ✅ Origin UI components\n\n`
     
     // Check for documentation results and perform AI-powered contextual analysis
     let docInfo = ""
