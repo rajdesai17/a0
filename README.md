@@ -2,9 +2,7 @@
 
 ## 📝 TL;DR
 
-**a0** is an AI-powered React component generator that creates professional, production-ready components by analyzing multiple API documentations simultaneously. Simply describe what you want or provide documentation URLs, and get a complete component with code, preview, and integration instructions.
-
-🚀 **Quick Example**: "create a pricing card integrated with https://stripe.com/docs https://supabase.com/docs" → Get a fully integrated component in seconds
+**a0** is an AI-powered React component generator that creates professional, production-ready components by analyzing multiple API documentations simultaneously. Simply describe what you want or provide documentation URLs, and get a complete component with code, preview, and integration instructions. built using ai-sdk and gemini-2.5-flash. 
 
 ---
 
@@ -23,21 +21,18 @@
 
 **Tech Stack**: Next.js 14 + AI SDK v5.0.34 + Google Gemini 2.5 Flash + Origin UI + TypeScript
 
-<table>
-  <tr>
-    <td><img width="100%" alt="image" src="https://github.com/user-attachments/assets/6c2d2c96-03a8-4960-acfe-347ca53fc274" /></td>
-    <td><img width="100%" alt="image" src="https://github.com/user-attachments/assets/a176259f-aa0c-4bbf-bab0-dde792081f2b" /></td>
-  </tr>
-</table>
-
 ## 🖼️ Screenshots
 
-<table>
-  <tr>
-    <td><img width="100%" alt="image" src="https://github.com/user-attachments/assets/6c2d2c96-03a8-4960-acfe-347ca53fc274" /></td>
-    <td><img width="100%" alt="image" src="https://github.com/user-attachments/assets/a176259f-aa0c-4bbf-bab0-dde792081f2b" /></td>
-  </tr>
-</table>
+<p align="center">
+  <img width="800" alt="image" src="https://github.com/user-attachments/assets/1b6577a3-5c3e-4a0e-81f3-701159f23a6c" />
+</p>
+
+<p align="center">
+  <img width="260" alt="image" src="https://github.com/user-attachments/assets/da2eb925-9e31-4b6e-9d6c-041508e015a1" />
+  <img width="260" alt="image" src="https://github.com/user-attachments/assets/2d16659c-7dc0-47a1-a5bb-143ca51cae43" />
+  <img width="260" alt="image" src="https://github.com/user-attachments/assets/87cef22c-7125-42fc-a260-9e7084929c32" />
+</p>
+
 
 ## 🚀 How It Works
 
