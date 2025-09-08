@@ -19,6 +19,7 @@ import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
 import { oneDark as syntaxOneDark, oneLight as syntaxOneLight } from "react-syntax-highlighter/dist/esm/styles/prism"
 import Link from "next/link"
 import ThemeToggle from "@/components/theme-toggle"
+import Navbar from "@/components/navbar"
 
 interface Message {
   id: string
@@ -39,10 +40,10 @@ export default function ChatPage() {
   return (
     <div className="p-6 max-w-md mx-auto bg-card text-card-foreground rounded-lg shadow-lg border border-border">
       <h2 className="text-xl font-semibold mb-4">
-        Welcome to AI Component Generator
+        Welcome to a0
       </h2>
       <p className="text-muted-foreground">
-        Describe the component you want to create and watch AI generate it instantly.
+        Describe your component and let AI generate React + TypeScript instantly.
       </p>
     </div>
   )
@@ -896,7 +897,7 @@ export default ${componentName}
             <div className="w-8 h-8 bg-primary rounded-xl flex items-center justify-center shadow-sm">
               <Sparkles className="w-4 h-4 text-primary-foreground" />
             </div>
-            <span className="font-semibold text-lg text-foreground">AI Component Generator</span>
+            <span className="font-semibold text-lg text-foreground">a0</span>
           </div>
           <div className="flex items-center gap-3">
             <Button variant="ghost" size="sm" asChild>
@@ -922,7 +923,7 @@ export default ${componentName}
               </div>
               <div>
                 <h1 className="font-semibold text-lg text-foreground">AI Assistant</h1>
-                <p className="text-sm text-muted-foreground">Component Generator with Gemini 2.0</p>
+                <p className="text-sm text-muted-foreground">Powered by Gemini 2.5 Flash</p>
               </div>
             </div>
           </div>
@@ -988,7 +989,7 @@ export default ${componentName}
             <Input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Describe the component you want to create..."
+              placeholder="Ask a0 to build a component..."
               className="flex-1 rounded-xl border-border/50 bg-background/50 px-4 py-3 focus:ring-2 focus:ring-primary/20"
               disabled={isLoading}
             />
@@ -1011,7 +1012,7 @@ export default ${componentName}
           <div className="flex items-center justify-between">
             <div>
               <h2 className="font-semibold text-lg text-foreground">Component Preview</h2>
-              <p className="text-sm text-muted-foreground">Live preview and code editor</p>
+              <p className="text-sm text-muted-foreground">Preview | Code | Docs</p>
             </div>
           </div>
         </div>

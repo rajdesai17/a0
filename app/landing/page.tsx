@@ -16,7 +16,7 @@ export default function LandingPage() {
             <div className="w-8 h-8 bg-primary rounded-xl flex items-center justify-center shadow-sm">
               <Sparkles className="w-4 h-4 text-primary-foreground" />
             </div>
-            <span className="font-semibold text-lg text-foreground">AI Component Generator</span>
+            <span className="font-semibold text-lg text-foreground">a0</span>
           </div>
           <div className="flex items-center gap-3">
             <Button variant="ghost" size="sm" asChild>
