@@ -64,8 +64,68 @@ window.default = WelcomeComponent;`)
   const [documentationResults, setDocumentationResults] = useState<any>(null)
   const [instructions, setInstructions] = useState<string>("")
 
+  // AI-powered contextual analysis of documentation - moved to component level
+  const analyzeDocumentationContext = async (documentationResults: any, userRequest: string) => {
+    if (!documentationResults?.results?.length) return null
+
+    try {
+      const docContent = documentationResults.results.map((result: any) => ({
+        url: result.url,
+        title: result.title,
+        content: result.content?.substring(0, 2000), // Limit content for analysis
+        endpoints: result.apiEndpoints || [],
+        analysis: result.analysis
+      }))
+
+      const analysisPrompt = `You are an API integration specialist. Create a concise, focused integration guide.
+
+USER REQUEST: "${userRequest}"
+
+DOCUMENTATION: ${JSON.stringify(docContent, null, 2)}
+
+Generate a practical guide with these sections (keep under 400 words total):
+
+**RELEVANT ENDPOINTS** (2-3 most important)
+• List only endpoints directly needed for "${userRequest}"
+
+**INTEGRATION STEPS** (3-4 steps)
+1. Specific step for this use case
+2. Next practical step
+3. Final implementation step
+
+**CODE EXAMPLE**
+One focused code snippet for the main functionality
+
+**AUTHENTICATION**
+Required headers/auth method
+
+**GOTCHAS** (2 key points)
+• Most important issue to avoid
+• Critical implementation detail
+
+Focus only on what's needed for this specific use case. Be concise and practical.`
+
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [{ role: 'user', content: analysisPrompt }],
+          analysis: true // Flag to indicate this is for analysis
+        })
+      })
+
+      if (response.ok) {
+        const analysisData = await response.text()
+        return analysisData
+      }
+    } catch (error) {
+      console.error('Failed to analyze documentation:', error)
+    }
+    return null
+  }
+
   // Enhanced component instructions with AI-powered contextual analysis
-  const generateInstructions = async (code: string): Promise<void> => {
+  const generateInstructions = async (code: string, userRequest?: string, docContext?: any): Promise<void> => {
     const componentName = extractComponentName(code)
     const hasState = code.includes("useState")
     const hasProps = code.includes("props") || code.includes(": {") || code.includes("interface")
@@ -120,66 +180,6 @@ window.default = WelcomeComponent;`)
       return props
     }
 
-    // AI-powered contextual analysis of documentation
-    const analyzeDocumentationContext = async (documentationResults: any, userRequest: string) => {
-      if (!documentationResults?.results?.length) return null
-
-      try {
-        const docContent = documentationResults.results.map((result: any) => ({
-          url: result.url,
-          title: result.title,
-          content: result.content?.substring(0, 2000), // Limit content for analysis
-          endpoints: result.apiEndpoints || [],
-          analysis: result.analysis
-        }))
-
-        const analysisPrompt = `You are an API integration specialist. Create a concise, focused integration guide.
-
-USER REQUEST: "${userRequest}"
-
-DOCUMENTATION: ${JSON.stringify(docContent, null, 2)}
-
-Generate a practical guide with these sections (keep under 400 words total):
-
-**RELEVANT ENDPOINTS** (2-3 most important)
-• List only endpoints directly needed for "${userRequest}"
-
-**INTEGRATION STEPS** (3-4 steps)
-1. Specific step for this use case
-2. Next practical step
-3. Final implementation step
-
-**CODE EXAMPLE**
-One focused code snippet for the main functionality
-
-**AUTHENTICATION**
-Required headers/auth method
-
-**GOTCHAS** (2 key points)
-• Most important issue to avoid
-• Critical implementation detail
-
-Focus only on what's needed for this specific use case. Be concise and practical.`
-
-        const response = await fetch('/api/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            messages: [{ role: 'user', content: analysisPrompt }],
-            analysis: true // Flag to indicate this is for analysis
-          })
-        })
-
-        if (response.ok) {
-          const analysisData = await response.text()
-          return analysisData
-        }
-      } catch (error) {
-        console.error('Failed to analyze documentation:', error)
-      }
-      return null
-    }
-
     let instructions = `# ${componentName} Component\n\n`
     
     // Check for documentation results and perform AI-powered contextual analysis
@@ -187,19 +187,80 @@ Focus only on what's needed for this specific use case. Be concise and practical
     let contextualAnalysis = null
     let apiEndpointsDetails: Array<{domain: string, endpoints: string[], analysis: any}> = []
     
-    try {
-      const docResponse = await fetch('/api/documentation')
-      const docData = await docResponse.json()
-      if (docData.hasDocumentation && docData.results) {
-        setDocumentationResults(docData.results)
+    // Use provided documentation context if available, otherwise fetch fresh
+    if (docContext && docContext.scrapedData) {
+      // Use provided documentation context
+      contextualAnalysis = docContext.analysis
+      console.log('📚 Using provided documentation context for instructions')
+      
+      const results = docContext.scrapedData.results?.filter((r: any) => r.success) || []
+      
+      if (results.length > 0) {
+        docInfo = `\n## 📚 API Documentation Analysis\n\n`
+        docInfo += `**URLs Analyzed:** ${results.length} documentation sources\n\n`
         
-        // Get the user's original request to provide contextual analysis
-        const userRequest = currentUserRequest || (messages.length > 0 ? messages[messages.length - 1]?.content || '' : '')
-        
-        // Use AI to analyze documentation in context of user's request
-        if (userRequest && hasFetch) {
-          contextualAnalysis = await analyzeDocumentationContext(docData.results, userRequest)
-        }
+        results.forEach((result: any, index: number) => {
+          const domain = new URL(result.url).hostname
+          docInfo += `### ${index + 1}. ${result.title || domain}\n`
+          docInfo += `**URL:** [${result.url}](${result.url})\n`
+          docInfo += `**Content:** ${result.wordCount || 0} words of documentation analyzed\n`
+          
+          if (result.apiEndpoints && result.apiEndpoints.length > 0) {
+            // Enhanced endpoint filtering for API documentation
+            const realEndpoints = result.apiEndpoints.filter((endpoint: string) => {
+              // Skip obvious static assets
+              if (endpoint.match(/\.(woff2?|ttf|eot|css|js|png|jpg|jpeg|gif|svg|ico)(\?|$)/i)) return false
+              if (endpoint.includes('font') || endpoint.includes('static')) return false
+              
+              // Accept endpoints that look like API routes
+              const lowerEndpoint = endpoint.toLowerCase()
+              return (
+                // Common API patterns
+                lowerEndpoint.includes('/api/') ||
+                lowerEndpoint.includes('/webhook') ||
+                lowerEndpoint.includes('endpoint') ||
+                lowerEndpoint.startsWith('http') ||
+                // HTTP method patterns (like "post /checkouts", "get /payments")
+                lowerEndpoint.match(/^(get|post|put|delete|patch)\s+\//) ||
+                // Path patterns that look like API endpoints
+                lowerEndpoint.match(/^\/[a-z-_]+/) ||
+                // Any path with parameters
+                lowerEndpoint.includes('{') || lowerEndpoint.includes(':id') || lowerEndpoint.includes('/:')
+              )
+            })
+            
+            if (realEndpoints.length > 0) {
+              docInfo += `**API Endpoints Found:** ${realEndpoints.length} real endpoints\n`
+              docInfo += `\`\`\`\n${realEndpoints.slice(0, 8).join('\n')}\n\`\`\`\n`
+              apiEndpointsDetails.push({
+                domain: domain,
+                endpoints: realEndpoints,
+                analysis: result.analysis
+              })
+            } else {
+              docInfo += `**Documentation Type:** General API documentation without specific endpoint URLs\n`
+            }
+          } else {
+            docInfo += `**Documentation Type:** General documentation without API endpoints\n`
+          }
+          docInfo += `\n`
+        })
+      }
+    } else {
+      // Fallback to existing documentation fetch logic (for backward compatibility)
+      try {
+        const docResponse = await fetch('/api/documentation')
+        const docData = await docResponse.json()
+        if (docData.hasDocumentation && docData.results) {
+          setDocumentationResults(docData.results)
+          
+          // Get the user's original request to provide contextual analysis
+          const requestToAnalyze = userRequest || currentUserRequest || (messages.length > 0 ? messages[messages.length - 1]?.content || '' : '')
+          
+          // Use AI to analyze documentation in context of user's request
+          if (requestToAnalyze && hasFetch) {
+            contextualAnalysis = await analyzeDocumentationContext(docData.results, requestToAnalyze)
+          }
         
         const results = docData.results.results?.filter((r: any) => r.success) || []
         
@@ -266,9 +327,10 @@ Focus only on what's needed for this specific use case. Be concise and practical
             docInfo += `\n`
           })
         }
+        }
+      } catch (error) {
+        console.error('Failed to fetch documentation:', error)
       }
-    } catch (error) {
-      console.log('No documentation data available')
     }
 
     instructions += `## Overview\n`
@@ -339,7 +401,7 @@ Focus only on what's needed for this specific use case. Be concise and practical
           const sampleValue = prop.type.includes('string') ? `"sample value"` : 
                              prop.type.includes('number') ? `{123}` :
                              prop.type.includes('boolean') ? `{true}` : `{{}}`
-          instructions += `  ${prop.name}=${sampleValue}  // ${prop.description}\n`
+          instructions += `  ${prop.name}=${sampleValue}\n`
         })
         instructions += `/>\n`
       }
@@ -641,25 +703,65 @@ export default ${componentName}
     const urlRegex = /(https?:\/\/[^\s]+)/gi
     const urls = input.match(urlRegex) || []
     
+    let documentationContext = null
+    
+    // Step 1: If URLs detected, scrape and analyze documentation first
+    if (urls.length > 0) {
+      try {
+        console.log('📚 Analyzing documentation from URLs:', urls)
+        
+        // Scrape documentation
+        const scrapeResponse = await fetch('/api/scrape', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ urls })
+        })
+        
+        if (scrapeResponse.ok) {
+          const scrapeData = await scrapeResponse.json()
+          console.log('📄 Documentation scraped successfully')
+          
+          // AI analysis of scraped documentation for context understanding
+          const analysisResult = await analyzeDocumentationContext(scrapeData.results || scrapeData, input.trim())
+          documentationContext = {
+            scrapedData: scrapeData,
+            analysis: analysisResult,
+            urls: urls,
+            summary: analysisResult // This will be used for component generation
+          }
+          console.log('🤖 Documentation analyzed for context')
+        } else {
+          console.warn('⚠️ Documentation scraping failed, proceeding without context')
+        }
+      } catch (docError) {
+        console.warn('⚠️ Documentation analysis failed:', docError)
+      }
+    }
+    
     // Add a generating status message with URL detection info
     const statusMessage: Message = {
       id: (Date.now() + 1).toString(),
       role: "assistant",
       content: urls.length > 0 
-        ? `🌐 Detected ${urls.length} URL(s) - Analyzing API documentation...\n📚 Scraping: ${urls.join(', ')}\n🎨 Generating your component with API integration...`
+        ? `🌐 Detected ${urls.length} URL(s) - Analyzing API documentation...\n📚 Scraping: ${urls.join(', ')}\n${documentationContext ? '✅ Documentation analyzed successfully' : '⚠️ Using basic analysis'}\n🎨 Generating your component with ${documentationContext ? 'API integration context' : 'standard features'}...`
         : "🎨 Generating your component...",
       timestamp: new Date(),
     }
     setMessages((prev) => [...prev, statusMessage])
 
     try {
+      // Step 2: Generate component with documentation context
+      const componentPrompt = documentationContext ? 
+        `${input}\n\nDOCUMENTATION CONTEXT FOR INTEGRATION:\n${JSON.stringify(documentationContext.summary, null, 2)}\n\nUse this context to create relevant API integrations, proper authentication, and realistic data handling in the component.` : 
+        input
+
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          messages: [...messages, newMessage],
+          messages: [...messages, { ...newMessage, content: componentPrompt }],
         }),
       })
 
@@ -699,6 +801,9 @@ export default ${componentName}
 
       // Set the generated code directly to preview
       setGeneratedCode(cleanCode)
+
+      // Step 3: Generate contextual instructions based on documentation context
+      await generateInstructions(cleanCode, input.trim(), documentationContext)
 
       // Check if documentation was analyzed and add results to success message
       let successContent = "✅ Component generated successfully! Check the preview →"
