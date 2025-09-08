@@ -8,9 +8,9 @@ import { Suspense } from "react"
 import "./globals.css"
 
 export const metadata: Metadata = {
-  title: "AI Component Generator",
-  description: "Generate React components with AI using Google Gemini 2.0",
-  generator: "v0.app",
+  title: "a0 - AI Component Studio",
+  description: "Generate React components with AI using Google Gemini 2.5 Flash",
+  generator: "a0",
 }
 
 export default function RootLayout({

@@ -2,40 +2,17 @@
 import { Button } from "@/components/origin-ui/button"
 import { Card } from "@/components/origin-ui/card"
 import { Badge } from "@/components/origin-ui/badge"
-import { ArrowRight, Sparkles, Code, Eye, Zap, Github, Download, Terminal, FileText, Layers, Smartphone } from "lucide-react"
+import { ArrowRight, Sparkles, Eye, Github, Download, Terminal } from "lucide-react"
 import Link from "next/link"
+import Navbar from "@/components/navbar"
 
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <Sparkles className="w-4 h-4 text-primary-foreground" />
-            </div>
-            <span className="font-semibold text-foreground">AI Component Generator</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="sm" asChild>
-              <Link href="https://github.com/rajdesai17/a0" target="_blank">
-                <Github className="w-4 h-4 mr-2" />
-                View Repo
-              </Link>
-            </Button>
-            <Button asChild>
-              <Link href="/chat">
-                Try Demo
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Link>
-            </Button>
-          </div>
-        </div>
-      </header>
+      <Navbar />
 
       {/* Hero Section */}
-      <section className="container mx-auto px-4 py-16 text-center">
+      <section className="container mx-auto px-4 py-16 pt-32 text-center">
         <div className="max-w-4xl mx-auto">
           <Badge variant="secondary" className="mb-6">
             <Sparkles className="w-3 h-3 mr-1" />
@@ -47,7 +24,7 @@ export default function LandingPage() {
           <p className="text-xl text-muted-foreground mb-8 text-pretty max-w-3xl mx-auto">
             Chat, browse docs, and generate production-ready components — fast, clean, and previewed live.
           </p>
-          
+
           {/* Tech Stack */}
           <div className="flex flex-wrap justify-center gap-2 mb-8">
             <Badge variant="outline">Next.js 15</Badge>
