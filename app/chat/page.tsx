@@ -101,7 +101,7 @@ One focused code snippet for the main functionality
 **AUTHENTICATION**
 Required headers/auth method
 
-**GOTCHAS** (2 key points)
+**IMPORTANT NOTES** (2 key points)
 • Most important issue to avoid
 • Critical implementation detail
 
@@ -183,6 +183,18 @@ Focus only on what's needed for this specific use case. Be concise and practical
     }
 
     let instructions = `# ${componentName} Component\n\n`
+    
+    // Add usage instructions first
+    instructions += `## 🚀 How to Use This Generated Component\n\n`
+    instructions += `### Quick Start (3 Steps)\n`
+    instructions += `1. **Download**: Click the "Download" button above to get the \`${componentName}.tsx\` file\n`
+    instructions += `2. **Place**: Put the file in your project's \`components/\` folder\n`
+    instructions += `3. **Import**: Use it in your React app:\n`
+    instructions += `\`\`\`jsx\nimport ${componentName} from './components/${componentName}'\n\nfunction App() {\n  return (\n    <div>\n      <${componentName} />\n    </div>\n  )\n}\n\`\`\`\n\n`
+    instructions += `### What You'll Need\n`
+    instructions += `- ✅ React 18+ project (Next.js, Vite, Create React App)\n`
+    instructions += `- ✅ Tailwind CSS configured\n`
+    instructions += `- ✅ Origin UI components (or shadcn/ui)\n\n`
     
     // Check for documentation results and perform AI-powered contextual analysis
     let docInfo = ""

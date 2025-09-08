@@ -21,7 +21,7 @@ Your response should be structured markdown that includes:
 3. **CODE EXAMPLES** - Working code examples for the most important endpoints
 4. **AUTHENTICATION** - What auth is needed (if any) with examples
 5. **KEY CONCEPTS** - Important concepts they need to understand
-6. **COMMON GOTCHAS** - Things to watch out for
+6. **IMPORTANT CONSIDERATIONS** - Things to watch out for
 
 Focus on being concise and practical. Don't repeat endpoint information - only show what they actually need for their specific use case.`
         },
