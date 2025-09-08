@@ -1,5 +1,6 @@
 import { streamText } from "ai"
 import { google } from "@ai-sdk/google"
+import { browseTool } from "@/lib/tools/browseTool"
 
 export async function POST(req: Request) {
   try {
@@ -20,10 +21,87 @@ export async function POST(req: Request) {
       return new Response('No valid messages provided', { status: 400 })
     }
 
-    const result = await streamText({
-      model: google("gemini-2.0-flash-exp"),
-      messages: aiMessages,
-      system: `You are a React component generator specialized in creating beautiful components using Origin UI design patterns and Tailwind CSS.
+    // Check for URLs in the latest user message
+    const latestMessage = aiMessages[aiMessages.length - 1]
+    const urlRegex = /(https?:\/\/[^\s]+)/gi
+    const urls = latestMessage.content.match(urlRegex) || []
+    
+    let documentationContext = ''
+    let browsingMessage = ''
+
+    // If URLs are detected, use browse tool to analyze them
+    if (urls.length > 0 && latestMessage.role === 'user') {
+      console.log('URLs detected:', urls)
+      try {
+        const browsingResult = await browseTool({ urls })
+        if (browsingResult.success) {
+          documentationContext = browsingResult.documentationContext
+          browsingMessage = `\n\n📚 **Documentation Analysis:**\n${browsingResult.message}\n\n`
+          console.log('Successfully browsed URLs, context length:', documentationContext.length)
+        } else {
+          browsingMessage = `\n\n⚠️ **Browsing Error:** Could not analyze the provided URLs.\n\n`
+        }
+      } catch (error) {
+        console.error('Error browsing URLs:', error)
+        browsingMessage = `\n\n⚠️ **Browsing Error:** ${error instanceof Error ? error.message : 'Unknown error'}\n\n`
+      }
+    }
+
+    // Enhanced system prompt with documentation awareness
+    const systemPrompt = documentationContext 
+      ? `You are a React component generator specialized in creating beautiful components using Origin UI design patterns and Tailwind CSS.
+
+📚 **DOCUMENTATION CONTEXT:**
+The user has provided URLs for API documentation. Use this context to create components that integrate with these APIs:
+
+${documentationContext}
+
+**Integration Requirements:**
+- Create components that work with the analyzed APIs
+- Include proper TypeScript interfaces based on API responses
+- Add error handling for API calls
+- Include loading states and proper UX
+- Use the API endpoints and patterns identified in the documentation
+- Follow the authentication methods described in the docs
+
+CRITICAL REQUIREMENTS:
+1. Respond with ONLY the React component code - no explanations, no markdown, no text before or after
+2. Use function declarations: function ComponentName() { }
+3. Use Origin UI design patterns and Tailwind CSS classes with the Origin UI color palette
+4. Component must be complete and functional with proper interactivity (useState, onClick handlers, etc.)
+5. No import statements needed (React is available globally)
+6. Always end your response with: window.default = ComponentName;
+7. **INCLUDE API INTEGRATION** - Use fetch() calls to integrate with the documented APIs
+8. Add proper error handling, loading states, and TypeScript interfaces for API responses
+
+ORIGIN UI DESIGN PATTERNS TO USE:
+- Colors: Use bg-background, text-foreground, bg-card, text-card-foreground, bg-primary, text-primary-foreground
+- Borders: Use border-border, rounded-lg (0.625rem radius)
+- Shadows: Use shadow-sm, shadow-md, shadow-lg
+- Spacing: Use consistent padding (p-4, p-6, p-8) and gaps (gap-4, gap-6)
+- Interactive states: Use hover:bg-accent, hover:text-accent-foreground, focus:ring-2 focus:ring-ring
+- Typography: Use font-medium, font-semibold for headings, text-sm, text-base for body
+- Buttons: Use bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2
+- Cards: Use bg-card text-card-foreground border border-border rounded-lg p-6 shadow-sm
+
+EXAMPLE PATTERNS:
+- Primary Button: className="bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-md font-medium transition-colors"
+- Card: className="bg-card text-card-foreground border border-border rounded-lg p-6 shadow-sm"
+- Input: className="bg-background border border-input px-3 py-2 rounded-md focus:ring-2 focus:ring-ring"
+- Badge: className="bg-secondary text-secondary-foreground px-2 py-1 rounded-md text-sm font-medium"
+
+COMPONENT EXAMPLES:
+For pricing cards, buttons, modals, forms - create modern, clean designs with:
+- Proper hover effects and transitions
+- Interactive functionality (state management)
+- Responsive design (use flex, grid, responsive prefixes)
+- Accessibility features (proper ARIA labels, semantic HTML)
+- Beautiful spacing and typography
+- Origin UI color scheme and styling patterns
+- **API Integration** - Real fetch() calls with proper error handling
+
+Remember: Only return the component code with window.default export, nothing else!`
+      : `You are a React component generator specialized in creating beautiful components using Origin UI design patterns and Tailwind CSS.
 
 CRITICAL REQUIREMENTS:
 1. Respond with ONLY the React component code - no explanations, no markdown, no text before or after
@@ -58,7 +136,12 @@ For pricing cards, buttons, modals, forms - create modern, clean designs with:
 - Beautiful spacing and typography
 - Origin UI color scheme and styling patterns
 
-Remember: Only return the component code with window.default export, nothing else!`,
+Remember: Only return the component code with window.default export, nothing else!`
+
+    const result = await streamText({
+      model: google("gemini-2.0-flash-exp"),
+      messages: aiMessages,
+      system: systemPrompt,
     })
 
     console.log('Stream created successfully') // Debug log
