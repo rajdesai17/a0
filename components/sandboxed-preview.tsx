@@ -129,10 +129,6 @@ export function SandboxedPreview({ code }: SandboxedPreviewProps) {
       font-family: system-ui, -apple-system, sans-serif;
       background: hsl(var(--background));
       color: hsl(var(--foreground));
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
     
     html {
