@@ -51,9 +51,11 @@ export async function scrapeUrl(url: string) {
     const apiEndpoints: string[] = []
     const endpointPatterns = [
       /\/api\/[^\s\)">]+/gi,
-      /\/v\d+\/[^\s\)">]+/gi,
       /(GET|POST|PUT|DELETE|PATCH)\s+\/[^\s\)">]+/gi,
       /https?:\/\/[^\s\/]+\/api\/[^\s\)">]+/gi,
+      // More specific patterns for actual API endpoints
+      /\/webhooks?\/[^\s\)">]+/gi,
+      /\/graphql[^\s\)">]*/gi,
     ]
 
     endpointPatterns.forEach(pattern => {
@@ -61,9 +63,11 @@ export async function scrapeUrl(url: string) {
       apiEndpoints.push(...matches)
     })
 
-    // Remove duplicates and clean up
+    // Remove duplicates and filter out non-API resources
     const uniqueEndpoints = [...new Set(apiEndpoints)]
       .filter(endpoint => endpoint.length < 100) // Filter out overly long matches
+      .filter(endpoint => !endpoint.match(/\.(woff2?|ttf|eot|css|js|png|jpg|jpeg|gif|svg|ico)(\?|$)/i)) // Exclude static assets
+      .filter(endpoint => !endpoint.includes('font')) // Exclude font-related paths
       .slice(0, 20) // Limit to 20 endpoints
 
     // Extract code examples (basic detection)

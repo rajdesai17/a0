@@ -81,6 +81,8 @@ CRITICAL REQUIREMENTS:
 7. **INCLUDE API INTEGRATION** - Use fetch() calls to integrate with the documented APIs
 8. Add proper error handling, loading states, and TypeScript interfaces for API responses
 9. **ADD COMMENTS** in your code indicating which API endpoints are being used and what they do
+10. **NO EXTERNAL ASSETS** - Do not reference external fonts, images, or stylesheets. Use only Tailwind classes and system fonts
+11. Use absolute URLs for any API calls (e.g., https://api.example.com/endpoint not /api/endpoint)
 
 ORIGIN UI DESIGN PATTERNS TO USE:
 - Colors: Use bg-background, text-foreground, bg-card, text-card-foreground, bg-primary, text-primary-foreground

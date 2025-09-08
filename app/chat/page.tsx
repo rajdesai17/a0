@@ -94,17 +94,33 @@ window.default = WelcomeComponent;`)
             docInfo += `**Content:** ${result.wordCount || 0} words analyzed\n`
             
             if (result.apiEndpoints && result.apiEndpoints.length > 0) {
-              docInfo += `**API Endpoints Found:** ${result.apiEndpoints.length}\n`
-              docInfo += `\`\`\`\n${result.apiEndpoints.slice(0, 5).join('\n')}\n\`\`\`\n`
+              // Filter out font files and static assets from endpoints
+              const realEndpoints = result.apiEndpoints.filter((endpoint: string) => 
+                !endpoint.match(/\.(woff2?|ttf|eot|css|js|png|jpg|jpeg|gif|svg|ico)(\?|$)/i) &&
+                !endpoint.includes('font') &&
+                (endpoint.includes('/api/') || endpoint.includes('GET') || endpoint.includes('POST') || 
+                 endpoint.includes('PUT') || endpoint.includes('DELETE') || endpoint.includes('/webhook'))
+              )
+              
+              if (realEndpoints.length > 0) {
+                docInfo += `**Real API Endpoints Found:** ${realEndpoints.length}\n`
+                docInfo += `\`\`\`\n${realEndpoints.slice(0, 5).join('\n')}\n\`\`\`\n`
+              } else {
+                docInfo += `**API Documentation Found:** General API documentation without specific endpoints listed\n`
+              }
+            } else {
+              docInfo += `**Documentation Type:** General API documentation\n`
             }
             
             if (result.analysis) {
-              docInfo += `**Integration Notes:** ${result.analysis.integrationNotes}\n`
               if (result.analysis.authMethods && result.analysis.authMethods.length > 0) {
                 docInfo += `**Authentication:** ${result.analysis.authMethods.join(', ')}\n`
               }
               if (result.analysis.commonPatterns && result.analysis.commonPatterns.length > 0) {
-                docInfo += `**Patterns:** ${result.analysis.commonPatterns.join(', ')}\n`
+                docInfo += `**Integration Patterns:** ${result.analysis.commonPatterns.join(', ')}\n`
+              }
+              if (result.analysis.integrationNotes) {
+                docInfo += `**Notes:** ${result.analysis.integrationNotes}\n`
               }
             }
             docInfo += `\n`
@@ -168,7 +184,51 @@ window.default = WelcomeComponent;`)
       instructions += `3. Import and use in your React application\n\n`
     }
 
-    if (hasFetch) {
+    if (hasFetch && documentationResults) {
+      instructions += `## API Integration Guide\n`
+      instructions += `This component integrates with the APIs you provided. Here's what you need to know:\n\n`
+      
+      const results = documentationResults.results?.filter((r: any) => r.success) || []
+      results.forEach((result: any, index: number) => {
+        const domain = new URL(result.url).hostname
+        instructions += `### ${domain} Integration\n`
+        
+        if (result.analysis?.authMethods && result.analysis.authMethods.length > 0) {
+          instructions += `**Authentication Required:** ${result.analysis.authMethods.join(', ')}\n`
+        }
+        
+        if (result.analysis?.baseUrl) {
+          instructions += `**Base URL:** \`${result.analysis.baseUrl}\`\n`
+        }
+        
+        // Filter real endpoints
+        const realEndpoints = result.apiEndpoints?.filter((endpoint: string) => 
+          !endpoint.match(/\.(woff2?|ttf|eot|css|js|png|jpg|jpeg|gif|svg|ico)(\?|$)/i) &&
+          !endpoint.includes('font') &&
+          (endpoint.includes('/api/') || endpoint.includes('GET') || endpoint.includes('POST'))
+        ) || []
+        
+        if (realEndpoints.length > 0) {
+          instructions += `**Key Endpoints:**\n`
+          realEndpoints.slice(0, 3).forEach((endpoint: string) => {
+            instructions += `- \`${endpoint}\`\n`
+          })
+        }
+        
+        if (result.analysis?.rateLimit) {
+          instructions += `**Rate Limits:** ${result.analysis.rateLimit}\n`
+        }
+        
+        instructions += `\n`
+      })
+      
+      instructions += `**Setup Steps:**\n`
+      instructions += `1. Sign up for API access at the provider's website\n`
+      instructions += `2. Get your API keys/tokens\n`
+      instructions += `3. Configure environment variables for API credentials\n`
+      instructions += `4. Test the endpoints in your development environment\n`
+      instructions += `5. Handle CORS if calling from browser\n\n`
+    } else if (hasFetch) {
       instructions += `## API Integration Notes\n`
       instructions += `This component includes API integration. Please note:\n`
       instructions += `- Ensure API endpoints are accessible from your domain\n`
@@ -236,11 +296,17 @@ export default ${componentName}
     setMessages((prev) => [...prev, newMessage])
     setInput("")
 
-    // Add a generating status message
+    // Check for URLs in the message
+    const urlRegex = /(https?:\/\/[^\s]+)/gi
+    const urls = input.match(urlRegex) || []
+    
+    // Add a generating status message with URL detection info
     const statusMessage: Message = {
       id: (Date.now() + 1).toString(),
       role: "assistant",
-      content: "🎨 Generating your component...",
+      content: urls.length > 0 
+        ? `🌐 Detected ${urls.length} URL(s) - Analyzing API documentation...\n📚 Scraping: ${urls.join(', ')}\n🎨 Generating your component with API integration...`
+        : "🎨 Generating your component...",
       timestamp: new Date(),
     }
     setMessages((prev) => [...prev, statusMessage])
@@ -293,11 +359,41 @@ export default ${componentName}
       // Set the generated code directly to preview
       setGeneratedCode(cleanCode)
 
+      // Check if documentation was analyzed and add results to success message
+      let successContent = "✅ Component generated successfully! Check the preview →"
+      
+      if (documentationResults) {
+        // Filter out font files from the count
+        const realEndpoints = documentationResults.apiEndpoints?.filter((endpoint: string) => 
+          !endpoint.match(/\.(woff2?|ttf|eot|css|js|png|jpg|jpeg|gif|svg|ico)(\?|$)/i) &&
+          !endpoint.includes('font') &&
+          (endpoint.includes('/api/') || endpoint.includes('GET') || endpoint.includes('POST') || 
+           endpoint.includes('PUT') || endpoint.includes('DELETE') || endpoint.includes('/webhook'))
+        ) || []
+        
+        successContent += `\n\n📚 **API Documentation Analyzed:**\n`
+        if (realEndpoints.length > 0) {
+          successContent += `• Found ${realEndpoints.length} real API endpoints\n`
+        } else {
+          successContent += `• Documentation analyzed (general API info)\n`
+        }
+        
+        if (documentationResults.authMethod) {
+          successContent += `• Authentication: ${documentationResults.authMethod}\n`
+        }
+        if (documentationResults.rateLimit) {
+          successContent += `• Rate Limits: ${documentationResults.rateLimit}\n`
+        }
+        if (documentationResults.baseUrl) {
+          successContent += `• Base URL: ${documentationResults.baseUrl}\n`
+        }
+      }
+
       // Update status message to success
       const successMessage: Message = {
         id: statusMessage.id,
         role: "assistant",
-        content: "✅ Component generated successfully! Check the preview →",
+        content: successContent,
         timestamp: new Date(),
       }
 
@@ -355,7 +451,22 @@ export default ${componentName}
                     message.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
                   }`}
                 >
-                  <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+                  {message.role === "assistant" && message.content.includes("📚 **API Documentation Analyzed:**") ? (
+                    <div className="text-sm leading-relaxed">
+                      <ReactMarkdown 
+                        components={{
+                          p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                          strong: ({ children }) => <strong className="font-semibold text-foreground">{children}</strong>,
+                          ul: ({ children }) => <ul className="ml-4 space-y-1">{children}</ul>,
+                          li: ({ children }) => <li className="text-sm">{children}</li>,
+                        }}
+                      >
+                        {message.content}
+                      </ReactMarkdown>
+                    </div>
+                  ) : (
+                    <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+                  )}
                   <p className="text-xs opacity-70 mt-1">{message.timestamp.toLocaleTimeString()}</p>
                 </div>
               </div>
