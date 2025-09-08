@@ -1,41 +1,21 @@
 "use client"
 
 import { useTheme } from "next-themes"
-import { useEffect, useState } from "react"
 import { MoonIcon, SunIcon } from "lucide-react"
-import { Toggle } from "@/components/origin-ui/toggle"
+import { Toggle } from "@/components/ui/toggle"
 
-export function ThemeToggle() {
+export default function ThemeToggle() {
   const { theme, setTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  if (!mounted) {
-    return (
-      <Toggle
-        variant="outline"
-        className="group data-[state=on]:hover:bg-muted size-9 data-[state=on]:bg-transparent"
-        disabled
-        aria-label="Loading theme toggle"
-      >
-        <SunIcon size={16} className="shrink-0" aria-hidden="true" />
-      </Toggle>
-    )
-  }
-
-  const isDark = theme === "dark"
 
   return (
     <Toggle
       variant="outline"
       className="group data-[state=on]:hover:bg-muted size-9 data-[state=on]:bg-transparent"
-      pressed={isDark}
-      onPressedChange={() => setTheme(isDark ? "light" : "dark")}
-      aria-label={`Switch to ${isDark ? "light" : "dark"} mode`}
+      pressed={theme === "dark"}
+      onPressedChange={() => setTheme(theme === "dark" ? "light" : "dark")}
+      aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
     >
+      {/* Note: After dark mode implementation, rely on dark: prefix rather than group-data-[state=on]: */}
       <MoonIcon
         size={16}
         className="shrink-0 scale-0 opacity-0 transition-all group-data-[state=on]:scale-100 group-data-[state=on]:opacity-100"

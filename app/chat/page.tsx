@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { ThemeToggle } from "@/components/theme-toggle"
 import { Send, Code, Eye, Sparkles, Download, FileText, ArrowLeft } from "lucide-react"
 import CodeMirror from "@uiw/react-codemirror"
 import { javascript } from "@codemirror/lang-javascript"
@@ -19,6 +18,7 @@ import ReactMarkdown from "react-markdown"
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
 import { oneDark as syntaxOneDark, oneLight as syntaxOneLight } from "react-syntax-highlighter/dist/esm/styles/prism"
 import Link from "next/link"
+import ThemeToggle from "@/components/theme-toggle"
 
 interface Message {
   id: string
@@ -367,13 +367,12 @@ Focus only on what's needed for this specific use case. Be concise and practical
 
     instructions += `### Step 3: Tailwind CSS Configuration\n`
     instructions += `Ensure Tailwind CSS is configured with Origin UI colors in your \`tailwind.config.js\`:\n`
-    instructions += `\`\`\`javascript\nmodule.exports = {\n  content: ["./src/**/*.{js,ts,jsx,tsx}", "./app/**/*.{js,ts,jsx,tsx}"],\n  theme: {\n    extend: {\n      colors: {\n        // Origin UI color tokens (required for proper styling)\n        border: "hsl(var(--border))",\n        background: "hsl(var(--background))",\n        foreground: "hsl(var(--foreground))",\n        primary: {\n          DEFAULT: "hsl(var(--primary))",\n          foreground: "hsl(var(--primary-foreground))",
-        },\n        // ... other Origin UI colors\n      }\n    }\n  },\n  plugins: [],\n}\`\`\`\n\n`
+    instructions += `\`\`\`javascript\nmodule.exports = {\n  content: ["./src/**/*.{js,ts,jsx,tsx}", "./app/**/*.{js,ts,jsx,tsx}"],\n  theme: {\n    extend: {\n      colors: {\n        // Origin UI color tokens (required for proper styling)\n        border: "hsl(var(--border))",\n        background: "hsl(var(--background))",\n        foreground: "hsl(var(--foreground))",\n        primary: {\n          DEFAULT: "hsl(var(--primary))",\n          foreground: "hsl(var(--primary-foreground))",\n        },\n        // ... other Origin UI colors\n      }\n    }\n  },\n  plugins: [],\n}\n\`\`\`\n\n`
     if (hasFetch) {
       instructions += `### Step 4: API Integration Setup\n`
       instructions += `For components with API integration, additional setup is required:\n\n`
       instructions += `**Environment Variables (\`.env.local\`):**\n`
-      instructions += `\`\`\`bash\n# Add your API credentials\nNEXT_PUBLIC_API_KEY=your_actual_api_key\nAPI_SECRET=your_actual_secret_key\nAPI_BASE_URL=https://api.example.com\n\`\`\`\n\n`
+      instructions += `\`\`\`bash\n# Add your API credentials\nNEXT_PUBLIC_API_KEY=your_api_key_here\nAPI_SECRET=your_secret_key\nAPI_BASE_URL=https://api.example.com\n\`\`\`\n\n`
       instructions += `**CORS Configuration:**\n`
       instructions += `If calling external APIs from the browser, ensure CORS is properly configured on the API server.\n\n`
     } else {
@@ -398,7 +397,7 @@ Focus only on what's needed for this specific use case. Be concise and practical
             apiDetail.analysis.authMethods.includes("API Key")
           ) {
             instructions += `**Authentication Setup Examples:**\n`
-            instructions += `\`\`\`javascript\n// Method 1: Using Authorization header\nconst headers = {\n  'Authorization': 'Bearer YOUR_TOKEN_HERE',\n  'Content-Type': 'application/json'\n}\n\n// Method 2: Using API key in header\nconst headers = {\n  'X-API-Key': 'YOUR_API_KEY_HERE',\n  'Content-Type': 'application/json'\n}\n\n// Usage in fetch\nconst response = await fetch('https://${apiDetail.domain}/api/endpoint', {\n  method: 'GET',\n  headers: headers\n})\`\`\`\n\n`
+            instructions += `\`\`\`javascript\n// Method 1: Using Authorization header\nconst headers = {\n  'Authorization': 'Bearer YOUR_TOKEN_HERE',\n  'Content-Type': 'application/json'\n}\n\n// Method 2: Using API key in header\nconst headers = {\n  'X-API-Key': 'YOUR_API_KEY_HERE',\n  'Content-Type': 'application/json'\n}\n\n// Usage in fetch\nconst response = await fetch('https://${apiDetail.domain}/api/endpoint', {\n  method: 'GET',\n  headers: headers\n})\n\`\`\`\n\n`
           }
         }
 
@@ -424,12 +423,11 @@ Focus only on what's needed for this specific use case. Be concise and practical
 
             instructions += `#### Endpoint ${idx + 1}: ${method} ${cleanEndpoint}\n\n`
             instructions += `**Quick Copy-Paste Example:**\n`
-            instructions += `\`\`\`javascript\n// ${method} ${cleanEndpoint}\nconst ${method.toLowerCase()}Data = async () => {\n  try {\n    const response = await fetch('${fullUrl}', {\n      method: '${method}',\n      headers: {\n        'Content-Type': 'application/json',\n        // Updated API key reference to avoid security warnings
-        'Authorization': 'Bearer ' + process.env.NEXT_PUBLIC_API_KEY,\n        // Add other required headers here\n      }${method === "POST" || method === "PUT" ? ',\n      body: JSON.stringify({\n        // Add your request payload here\n        // Example: { name: "value", id: 123 }\n      })' : ""}\n    })\n    \n    if (!response.ok) {\n      throw new Error(\`HTTP error! status: \${response.status}\`)\n    }\n    \n    const data = await response.json()\n    return data\n  } catch (error) {\n    console.error('API Error:', error)\n    throw error\n  }\n}\`\`\`\n\n`
+            instructions += `\`\`\`javascript\n// ${method} ${cleanEndpoint}\nconst ${method.toLowerCase()}Data = async () => {\n  try {\n    const response = await fetch('${fullUrl}', {\n      method: '${method}',\n      headers: {\n        'Content-Type': 'application/json',\n        'Authorization': 'Bearer ' + process.env.NEXT_PUBLIC_API_KEY,\n        // Add other required headers here\n      }${method === "POST" || method === "PUT" ? ',\n      body: JSON.stringify({\n        // Add your request payload here\n        // Example: { name: "value", id: 123 }\n      })' : ""}\n    })\n    \n    if (!response.ok) {\n      throw new Error(\`HTTP error! status: \${response.status}\`)\n    }\n    \n    const data = await response.json()\n    return data\n  } catch (error) {\n    console.error('API Error:', error)\n    throw error\n  }\n}\n\`\`\`\n\n`
 
             // Add React hook usage example
             instructions += `**React Hook Integration:**\n`
-            instructions += `\`\`\`jsx\nimport { useState, useEffect } from 'react'\n\nconst MyComponent = () => {\n  const [data, setData] = useState(null)\n  const [loading, setLoading] = useState(false)\n  const [error, setError] = useState(null)\n\n  const fetchData = async () => {\n    setLoading(true)\n    setError(null)\n    try {\n      const result = await ${method.toLowerCase()}Data()\n      setData(result)\n    } catch (err) {\n      setError(err.message)\n    } finally {\n      setLoading(false)\n    }\n  }\n\n  useEffect(() => {\n    fetchData() // Fetch on component mount\n  }, [])\n\n  if (loading) return <div>Loading...</div>\n  if (error) return <div>Error: {error}</div>\n  if (!data) return <div>No data</div>\n\n  return (\n    <div>\n      {/* Render your data here */}\n      <pre>{JSON.stringify(data, null, 2)}</pre>\n    </div>\n  )\n}\`\`\`\n\n`
+            instructions += `\`\`\`jsx\nimport { useState, useEffect } from 'react'\n\nconst MyComponent = () => {\n  const [data, setData] = useState(null)\n  const [loading, setLoading] = useState(false)\n  const [error, setError] = useState(null)\n\n  const fetchData = async () => {\n    setLoading(true)\n    setError(null)\n    try {\n      const result = await ${method.toLowerCase()}Data()\n      setData(result)\n    } catch (err) {\n      setError(err.message)\n    } finally {\n      setLoading(false)\n    }\n  }\n\n  useEffect(() => {\n    fetchData() // Fetch on component mount\n  }, [])\n\n  if (loading) return <div>Loading...</div>\n  if (error) return <div>Error: {error}</div>\n  if (!data) return <div>No data</div>\n\n  return (\n    <div>\n      {/* Render your data here */}\n      <pre>{JSON.stringify(data, null, 2)}</pre>\n    </div>\n  )\n}\n\`\`\`\n\n`
           })
         }
 
@@ -440,7 +438,7 @@ Focus only on what's needed for this specific use case. Be concise and practical
         if (apiDetail.analysis?.rateLimit) {
           instructions += `**⚡ Rate Limits:** ${apiDetail.analysis.rateLimit}\n\n`
           instructions += `**Rate Limiting Best Practice:**\n`
-          instructions += `\`\`\`javascript\n// Simple rate limiting with delays\nconst delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))\n\nconst rateLimitedFetch = async (url, options) => {\n  await delay(100) // 100ms delay between requests\n  return fetch(url, options)\n}\`\`\`\n\n`
+          instructions += `\`\`\`javascript\n// Simple rate limiting with delays\nconst delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))\n\nconst rateLimitedFetch = async (url, options) => {\n  await delay(100) // 100ms delay between requests\n  return fetch(url, options)\n}\n\`\`\`\n\n`
         }
 
         if (apiDetail.analysis?.integrationNotes) {
@@ -464,9 +462,9 @@ Focus only on what's needed for this specific use case. Be concise and practical
 
       instructions += `### 🔧 Development vs Production Configuration\n\n`
       instructions += `**Development Environment:**\n`
-      instructions += `\`\`\`javascript\n// .env.local (for development)\nNEXT_PUBLIC_API_BASE_URL=https://dev-api.${apiEndpointsDetails[0]?.domain || "example.com"}\nNEXT_PUBLIC_API_KEY=development_key_here\n\n// In your component\nconst API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL\nconst API_KEY = process.env.NEXT_PUBLIC_API_KEY\n\`\`\`\n\n`
+      instructions += `\`\`\`javascript\n// .env.local (for development)\nNEXT_PUBLIC_API_BASE_URL=https://dev-api.${apiEndpointsDetails[0]?.domain || "example.com"}\nNEXT_PUBLIC_API_KEY=dev_key_here\n\n// In your component\nconst API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL\nconst API_KEY = process.env.NEXT_PUBLIC_API_KEY\n\`\`\`\n\n`
       instructions += `**Production Environment:**\n`
-      instructions += `\`\`\`javascript\n// .env.production (for production)\nNEXT_PUBLIC_API_BASE_URL=https://api.${apiEndpointsDetails[0]?.domain || "example.com"}\nNEXT_PUBLIC_API_KEY=production_key_here\n\n// Same component code works in both environments!\n\`\`\`\n\n`
+      instructions += `\`\`\`javascript\n// .env.production (for production)\nNEXT_PUBLIC_API_BASE_URL=https://api.${apiEndpointsDetails[0]?.domain || "example.com"}\nNEXT_PUBLIC_API_KEY=prod_key_here\n\n// Same component code works in both environments!\n\`\`\`\n\n`
     } else if (hasFetch && !contextualAnalysis) {
       instructions += `## 🔗 API Integration Guide\n\n`
       instructions += `This component includes API integration capabilities. Here's what you need to know:\n\n`
@@ -477,11 +475,10 @@ Focus only on what's needed for this specific use case. Be concise and practical
       instructions += `4. **Error Handling:** Implement retry strategies and proper error handling\n\n`
 
       instructions += `### Basic API Integration Example\n`
-      instructions += `\`\`\`javascript\n// Complete API integration example\nconst [data, setData] = useState(null)\nconst [loading, setLoading] = useState(false)\nconst [error, setError] = useState(null)\n\nconst fetchData = async () => {\n  setLoading(true)\n  setError(null)\n  \n  try {\n    const response = await fetch('/api/your-endpoint', {\n      method: 'GET',\n      headers: {\n        'Content-Type': 'application/json',\n        // Updated to use environment variable reference without triggering security warnings
-        'Authorization': 'Bearer ' + process.env.NEXT_PUBLIC_API_KEY\n      }\n    })\n    \n    if (!response.ok) {\n      throw new Error(\`HTTP error! status: \${response.status}\`)\n    }\n    \n    const result = await response.json()\n    setData(result)\n  } catch (error) {\n    console.error('Fetch error:', error)\n    setError(error.message)\n  } finally {\n    setLoading(false)\n  }\n}\n\n// Use in component\nuseEffect(() => {\n  fetchData()\n}, [])\`\`\`\n\n`
+      instructions += `\`\`\`javascript\n// Complete API integration example\nconst [data, setData] = useState(null)\nconst [loading, setLoading] = useState(false)\nconst [error, setError] = useState(null)\n\nconst fetchData = async () => {\n  setLoading(true)\n  setError(null)\n  \n  try {\n    const response = await fetch('/api/your-endpoint', {\n      method: 'GET',\n      headers: {\n        'Content-Type': 'application/json',\n        'Authorization': 'Bearer ' + process.env.NEXT_PUBLIC_API_KEY\n      }\n    })\n    \n    if (!response.ok) {\n      throw new Error(\`HTTP error! status: \${response.status}\`)\n    }\n    \n    const result = await response.json()\n    setData(result)\n  } catch (error) {\n    console.error('Fetch error:', error)\n    setError(error.message)\n  } finally {\n    setLoading(false)\n  }\n}\n\n// Use in component\nuseEffect(() => {\n  fetchData()\n}, [])\n\`\`\`\n\n`
 
       instructions += `### Environment Variables Setup\n`
-      instructions += `\`\`\`bash\n# .env.local\nNEXT_PUBLIC_API_URL=https://api.example.com\nNEXT_PUBLIC_API_KEY=your_actual_api_key\n\`\`\`\n\n`
+      instructions += `\`\`\`bash\n# .env.local\nNEXT_PUBLIC_API_URL=https://api.example.com\nNEXT_PUBLIC_API_KEY=your_api_key_here\n\`\`\`\n\n`
     }
 
     instructions += `## 🎯 Customization Guide\n\n`
@@ -507,7 +504,7 @@ Focus only on what's needed for this specific use case. Be concise and practical
     }
 
     instructions += `### Advanced Customization\n`
-    instructions += `\`\`\`jsx\n// Override component styles with custom CSS classes\n<${componentName} className="your-custom-class" />\n\n// Add custom CSS variables for dynamic theming\n<div style={{\n  '--custom-primary': '#your-color',\n  '--custom-radius': '8px'\n}}>\n  <${componentName} />\n</div>\`\`\`\n\n`
+    instructions += `\`\`\`jsx\n// Override component styles with custom CSS classes\n<${componentName} className="your-custom-class" />\n\n// Add custom CSS variables for dynamic theming\n<div style={{\n  '--custom-primary': '#your-color',\n  '--custom-radius': '8px'\n}}>\n  <${componentName} />\n</div>\n\`\`\`\n\n`
 
     instructions += `## 🐛 Troubleshooting Guide\n\n`
     instructions += `### Common Issues & Solutions\n\n`
@@ -797,22 +794,22 @@ export default ${componentName}
       <div className="w-1/2 flex flex-col border-r border-border">
         {/* Chat Header */}
         <div className="p-4 border-b border-border bg-card">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Button variant="ghost" size="sm" asChild>
-                <Link href="/landing">
-                  <ArrowLeft className="w-4 h-4" />
-                </Link>
-              </Button>
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-primary" />
-                <div>
-                  <h1 className="font-semibold text-foreground">AI Assistant</h1>
-                  <p className="text-sm text-muted-foreground">Component Generator with Gemini 2.0</p>
-                </div>
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/landing">
+                <ArrowLeft className="w-4 h-4" />
+              </Link>
+            </Button>
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-primary" />
+              <div>
+                <h1 className="font-semibold text-foreground">AI Assistant</h1>
+                <p className="text-sm text-muted-foreground">Component Generator with Gemini 2.0</p>
               </div>
             </div>
-            <ThemeToggle />
+            <div className="ml-auto">
+              <ThemeToggle />
+            </div>
           </div>
         </div>
 

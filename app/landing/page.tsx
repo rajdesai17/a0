@@ -2,9 +2,9 @@
 import { Button } from "@/components/origin-ui/button"
 import { Card } from "@/components/origin-ui/card"
 import { Badge } from "@/components/origin-ui/badge"
-import { ThemeToggle } from "@/components/theme-toggle"
 import { ArrowRight, Sparkles, Eye, Github, Download, Terminal } from "lucide-react"
 import Link from "next/link"
+import ThemeToggle from "@/components/theme-toggle"
 
 export default function LandingPage() {
   return (
