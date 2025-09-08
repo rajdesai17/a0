@@ -87,7 +87,7 @@ All generated components follow Origin UI conventions with full type safety.
 
 **Workflows:**
 - Real-time streaming chat (split-screen: chat + preview)
-- Multi-API crawler with parallel scraping
+- Multi-API Fetch URLs with parallel scraping
 - Context passed into AI for accurate code generation
 - Auto-generated usage docs for each component
 
