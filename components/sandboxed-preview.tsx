@@ -131,6 +131,28 @@ export function SandboxedPreview({ code }: SandboxedPreviewProps) {
       color: hsl(var(--foreground));
     }
     
+    html {
+      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none; /* IE/Edge */
+    }
+    
+    html::-webkit-scrollbar {
+      display: none; /* Chrome/Safari/Webkit */
+    }
+    
+    body::-webkit-scrollbar {
+      display: none; /* Chrome/Safari/Webkit */
+    }
+    
+    * {
+      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none; /* IE/Edge */
+    }
+    
+    *::-webkit-scrollbar {
+      display: none; /* Chrome/Safari/Webkit */
+    }
+    
     .error {
       color: #ef4444;
       background: #fef2f2;
@@ -232,13 +254,22 @@ export function SandboxedPreview({ code }: SandboxedPreviewProps) {
   }, [])
 
   return (
-    <Card className="h-full overflow-hidden">
+    <Card className="h-full overflow-hidden rounded-xl border-border/50 shadow-sm">
       {error && (
         <div className="p-4 bg-destructive/10 border-b border-destructive/20">
           <p className="text-sm text-destructive font-mono">{error}</p>
         </div>
       )}
-      <iframe ref={iframeRef} className="w-full h-full border-0" sandbox="allow-scripts allow-same-origin" title="Component Preview" />
+      <iframe 
+        ref={iframeRef} 
+        className="w-full h-full border-0" 
+        sandbox="allow-scripts allow-same-origin" 
+        title="Component Preview"
+        style={{
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none'
+        }}
+      />
     </Card>
   )
 }
