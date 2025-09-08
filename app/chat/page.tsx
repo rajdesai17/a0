@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Send, Code, Eye, Sparkles, Download, FileText, ArrowLeft } from "lucide-react"
+import { Send, Code, Eye, Sparkles, Download, FileText, ArrowLeft, Github, ArrowRight } from "lucide-react"
 import CodeMirror from "@uiw/react-codemirror"
 import { javascript } from "@codemirror/lang-javascript"
 import { oneDark } from "@codemirror/theme-one-dark"
@@ -888,38 +888,61 @@ export default ${componentName}
   }
 
   return (
-    <div className="h-screen flex bg-background overflow-hidden">
-      {/* Left Panel - Chat */}
-      <div className="w-1/2 flex flex-col border-r border-border">
-        {/* Chat Header */}
-        <div className="p-4 border-b border-border bg-card">
+    <div className="h-screen flex flex-col bg-background overflow-hidden">
+      {/* Header/Navbar */}
+      <header className="border-b border-border bg-card/50 backdrop-blur-sm z-50">
+        <div className="container mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="sm" asChild>
+            <div className="w-8 h-8 bg-primary rounded-xl flex items-center justify-center shadow-sm">
+              <Sparkles className="w-4 h-4 text-primary-foreground" />
+            </div>
+            <span className="font-semibold text-lg text-foreground">AI Component Generator</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="sm" className="rounded-full" asChild>
               <Link href="/landing">
-                <ArrowLeft className="w-4 h-4" />
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Landing
               </Link>
             </Button>
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-primary" />
+            <Button variant="ghost" size="sm" className="rounded-full" asChild>
+              <Link href="https://github.com/rajdesai17/a0" target="_blank">
+                <Github className="w-4 h-4 mr-2" />
+                View Repo
+              </Link>
+            </Button>
+            <ThemeToggle />
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content - Split Screen with rounded corners */}
+      <div className="flex-1 flex bg-background p-4 gap-4 overflow-hidden">
+        {/* Left Panel - Chat */}
+        <div className="w-1/2 flex flex-col bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
+          {/* Chat Header */}
+          <div className="p-6 border-b border-border bg-card">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                <Sparkles className="w-5 h-5 text-primary" />
+              </div>
               <div>
-                <h1 className="font-semibold text-foreground">AI Assistant</h1>
+                <h1 className="font-semibold text-lg text-foreground">AI Assistant</h1>
                 <p className="text-sm text-muted-foreground">Component Generator with Gemini 2.0</p>
               </div>
             </div>
-            <div className="ml-auto">
-              <ThemeToggle />
-            </div>
           </div>
-        </div>
 
         {/* Messages */}
-        <ScrollArea className="flex-1 p-4">
-          <div className="space-y-4">
+        <ScrollArea className="flex-1 p-6">
+          <div className="space-y-6">
             {messages.map((message) => (
               <div key={message.id} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
                 <div
-                  className={`max-w-[80%] rounded-lg p-3 ${
-                    message.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                  className={`max-w-[85%] rounded-2xl p-4 shadow-sm ${
+                    message.role === "user" 
+                      ? "bg-primary text-primary-foreground rounded-br-md" 
+                      : "bg-muted/50 text-muted-foreground rounded-bl-md"
                   }`}
                 >
                   {message.role === "assistant" && message.content.includes("📚 **API Documentation Analyzed:**") ? (
@@ -966,19 +989,20 @@ export default ${componentName}
         )}
 
         {/* Input */}
-        <div className="p-4 border-t border-border">
-          <form onSubmit={handleSubmit} className="flex gap-2">
+        <div className="p-6 border-t border-border">
+          <form onSubmit={handleSubmit} className="flex gap-3">
             <Input
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Describe the component you want to create..."
-              className="flex-1"
+              className="flex-1 rounded-xl border-border/50 bg-background/50 px-4 py-3 focus:ring-2 focus:ring-primary/20"
               disabled={isLoading}
             />
             <Button
               type="submit"
               disabled={isLoading || !input?.trim()}
               title={!input?.trim() ? "Type a message first" : "Send message"}
+              className="rounded-xl px-6 py-3 shadow-sm"
             >
               <Send className="w-4 h-4" />
             </Button>
@@ -987,12 +1011,12 @@ export default ${componentName}
       </div>
 
       {/* Right Panel - Preview */}
-      <div className="w-1/2 flex flex-col">
+      <div className="w-1/2 flex flex-col bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
         {/* Preview Header */}
-        <div className="p-4 border-b border-border bg-card">
+        <div className="p-6 border-b border-border bg-card">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="font-semibold text-foreground">Component Preview</h2>
+              <h2 className="font-semibold text-lg text-foreground">Component Preview</h2>
               <p className="text-sm text-muted-foreground">Live preview and code editor</p>
             </div>
           </div>
@@ -1000,29 +1024,31 @@ export default ${componentName}
 
         {/* Tabs */}
         <Tabs value={selectedTab} onValueChange={setSelectedTab} className="flex-1 flex flex-col overflow-hidden">
-          <div className="px-4 pt-4 pb-0 flex-shrink-0">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="preview" className="flex items-center gap-2">
+          <div className="px-6 pt-4 pb-0 flex-shrink-0">
+            <TabsList className="grid w-full grid-cols-3 rounded-xl">
+              <TabsTrigger value="preview" className="flex items-center gap-2 rounded-lg">
                 <Eye className="w-4 h-4" />
                 Preview
               </TabsTrigger>
-              <TabsTrigger value="code" className="flex items-center gap-2">
+              <TabsTrigger value="code" className="flex items-center gap-2 rounded-lg">
                 <Code className="w-4 h-4" />
                 Code
               </TabsTrigger>
-              <TabsTrigger value="instructions" className="flex items-center gap-2">
+              <TabsTrigger value="instructions" className="flex items-center gap-2 rounded-lg">
                 <FileText className="w-4 h-4" />
                 Instructions
               </TabsTrigger>
             </TabsList>
           </div>
 
-          <TabsContent value="preview" className="flex-1 p-4 pt-2 overflow-hidden">
-            <SandboxedPreview code={generatedCode} />
+          <TabsContent value="preview" className="flex-1 p-6 pt-4 overflow-hidden">
+            <Card className="h-full rounded-xl border-border/50 overflow-hidden shadow-sm">
+              <SandboxedPreview code={generatedCode} />
+            </Card>
           </TabsContent>
 
-          <TabsContent value="code" className="flex-1 p-4 pt-2 flex flex-col overflow-hidden">
-            <div className="flex items-center justify-between mb-2">
+          <TabsContent value="code" className="flex-1 p-6 pt-4 flex flex-col overflow-hidden">
+            <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-medium text-muted-foreground">Component Code</h3>
               <div className="flex items-center gap-2">
                 {downloadSuccess && <span className="text-sm text-green-600 dark:text-green-400">Downloaded!</span>}
@@ -1030,14 +1056,14 @@ export default ${componentName}
                   onClick={downloadComponent}
                   size="sm"
                   variant="outline"
-                  className="flex items-center gap-2 bg-transparent"
+                  className="flex items-center gap-2 bg-transparent rounded-lg"
                 >
                   <Download className="w-4 h-4" />
                   Download
                 </Button>
               </div>
             </div>
-            <Card className="flex-1 overflow-hidden">
+            <Card className="flex-1 overflow-hidden rounded-xl border-border/50 shadow-sm">
               <CodeMirror
                 value={generatedCode}
                 onChange={(value) => setGeneratedCode(value)}
@@ -1048,8 +1074,8 @@ export default ${componentName}
             </Card>
           </TabsContent>
 
-          <TabsContent value="instructions" className="flex-1 p-4 pt-2 overflow-hidden">
-            <Card className="h-full overflow-hidden">
+          <TabsContent value="instructions" className="flex-1 p-6 pt-4 overflow-hidden">
+            <Card className="h-full overflow-hidden rounded-xl border-border/50 shadow-sm">
               <div className="h-full overflow-y-auto scrollbar-hide p-6">
                 <div className="prose prose-sm max-w-none text-foreground leading-relaxed">
                   <ReactMarkdown

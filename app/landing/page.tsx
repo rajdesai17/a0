@@ -19,7 +19,6 @@ export default function LandingPage() {
             <span className="font-semibold text-foreground">AI Component Generator</span>
           </div>
           <div className="flex items-center gap-3">
-            <ThemeToggle />
             <Button variant="ghost" size="sm" asChild>
               <Link href="https://github.com/rajdesai17/a0" target="_blank">
                 <Github className="w-4 h-4 mr-2" />
@@ -32,6 +31,7 @@ export default function LandingPage() {
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Link>
             </Button>
+            <ThemeToggle />
           </div>
         </div>
       </header>
