@@ -18,6 +18,7 @@ import ReactMarkdown from "react-markdown"
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
 import { oneDark as syntaxOneDark, oneLight as syntaxOneLight } from "react-syntax-highlighter/dist/esm/styles/prism"
 import Link from "next/link"
+import ThemeToggle from "@/components/theme-toggle"
 
 interface Message {
   id: string
@@ -135,15 +136,15 @@ Focus only on what's needed for this specific use case. Be concise and practical
 
     // Extract component props and their types for detailed documentation
     const extractComponentProps = (code: string) => {
-      const props: Array<{name: string, type: string, optional: boolean, description: string}> = []
-      
+      const props: Array<{ name: string; type: string; optional: boolean; description: string }> = []
+
       // Look for interface definitions
       const interfaceMatch = code.match(/interface\s+\w+Props\s*\{([^}]+)\}/)
       if (interfaceMatch) {
         const interfaceContent = interfaceMatch[1]
         const propMatches = interfaceContent.match(/(\w+)(\?)?\s*:\s*([^;\n]+)/g)
         if (propMatches) {
-          propMatches.forEach(match => {
+          propMatches.forEach((match) => {
             const matchResult = match.match(/(\w+)(\?)?\s*:\s*(.+)/)
             if (matchResult) {
               const [, propName, optional, propType] = matchResult
@@ -152,31 +153,31 @@ Focus only on what's needed for this specific use case. Be concise and practical
                   name: propName,
                   type: propType.trim(),
                   optional: !!optional,
-                  description: `${propName} property of type ${propType.trim()}`
+                  description: `${propName} property of type ${propType.trim()}`,
                 })
               }
             }
           })
         }
       }
-      
+
       // Look for destructured props in function parameters
-      const destructuredMatch = code.match(/\(\s*\{\s*([^}]+)\s*\}[^)]*\)/)
+      const destructuredMatch = code.match(/$$\s*\{\s*([^}]+)\s*\}[^)]*$$/)
       if (destructuredMatch && !interfaceMatch) {
-        const destructuredProps = destructuredMatch[1].split(',').map(p => p.trim())
-        destructuredProps.forEach(prop => {
-          const [name, defaultValue] = prop.split('=').map(p => p.trim())
-          if (name && !props.some(p => p.name === name)) {
+        const destructuredProps = destructuredMatch[1].split(",").map((p) => p.trim())
+        destructuredProps.forEach((prop) => {
+          const [name, defaultValue] = prop.split("=").map((p) => p.trim())
+          if (name && !props.some((p) => p.name === name)) {
             props.push({
               name: name,
-              type: defaultValue ? 'string | undefined' : 'any',
+              type: defaultValue ? "string | undefined" : "any",
               optional: !!defaultValue,
-              description: `${name} property${defaultValue ? ` (default: ${defaultValue})` : ''}`
+              description: `${name} property${defaultValue ? ` (default: ${defaultValue})` : ""}`,
             })
           }
         })
       }
-      
+
       return props
     }
 
@@ -263,48 +264,50 @@ Focus only on what's needed for this specific use case. Be concise and practical
           }
         
         const results = docData.results.results?.filter((r: any) => r.success) || []
-        
+
         if (results.length > 0) {
           docInfo = `\n## 📚 API Documentation Analysis\n\n`
           docInfo += `**URLs Analyzed:** ${results.length} documentation sources\n\n`
-          
+
           results.forEach((result: any, index: number) => {
             const domain = new URL(result.url).hostname
             docInfo += `### ${index + 1}. ${result.title || domain}\n`
             docInfo += `**URL:** [${result.url}](${result.url})\n`
             docInfo += `**Content:** ${result.wordCount || 0} words of documentation analyzed\n`
-            
+
             if (result.apiEndpoints && result.apiEndpoints.length > 0) {
               // Enhanced endpoint filtering for API documentation
               const realEndpoints = result.apiEndpoints.filter((endpoint: string) => {
                 // Skip obvious static assets
                 if (endpoint.match(/\.(woff2?|ttf|eot|css|js|png|jpg|jpeg|gif|svg|ico)(\?|$)/i)) return false
-                if (endpoint.includes('font') || endpoint.includes('static')) return false
-                
+                if (endpoint.includes("font") || endpoint.includes("static")) return false
+
                 // Accept endpoints that look like API routes
                 const lowerEndpoint = endpoint.toLowerCase()
                 return (
                   // Common API patterns
-                  lowerEndpoint.includes('/api/') ||
-                  lowerEndpoint.includes('/webhook') ||
-                  lowerEndpoint.includes('endpoint') ||
-                  lowerEndpoint.startsWith('http') ||
+                  lowerEndpoint.includes("/api/") ||
+                  lowerEndpoint.includes("/webhook") ||
+                  lowerEndpoint.includes("endpoint") ||
+                  lowerEndpoint.startsWith("http") ||
                   // HTTP method patterns (like "post /checkouts", "get /payments")
                   lowerEndpoint.match(/^(get|post|put|delete|patch)\s+\//) ||
                   // Path patterns that look like API endpoints
                   lowerEndpoint.match(/^\/[a-z-_]+/) ||
                   // Any path with parameters
-                  lowerEndpoint.includes('{') || lowerEndpoint.includes(':id') || lowerEndpoint.includes('/:')
+                  lowerEndpoint.includes("{") ||
+                  lowerEndpoint.includes(":id") ||
+                  lowerEndpoint.includes("/:")
                 )
               })
-              
+
               if (realEndpoints.length > 0) {
                 docInfo += `**API Endpoints Found:** ${realEndpoints.length} real endpoints\n`
-                docInfo += `\`\`\`\n${realEndpoints.slice(0, 8).join('\n')}\n\`\`\`\n`
+                docInfo += `\`\`\`\n${realEndpoints.slice(0, 8).join("\n")}\n\`\`\`\n`
                 apiEndpointsDetails.push({
                   domain: domain,
                   endpoints: realEndpoints,
-                  analysis: result.analysis
+                  analysis: result.analysis,
                 })
               } else {
                 docInfo += `**Documentation Type:** General API documentation without specific endpoint URLs\n`
@@ -312,13 +315,13 @@ Focus only on what's needed for this specific use case. Be concise and practical
             } else {
               docInfo += `**Documentation Type:** Conceptual API documentation\n`
             }
-            
+
             if (result.analysis) {
               if (result.analysis.authMethods && result.analysis.authMethods.length > 0) {
-                docInfo += `**🔐 Authentication:** ${result.analysis.authMethods.join(', ')}\n`
+                docInfo += `**🔐 Authentication:** ${result.analysis.authMethods.join(", ")}\n`
               }
               if (result.analysis.commonPatterns && result.analysis.commonPatterns.length > 0) {
-                docInfo += `**📋 Integration Patterns:** ${result.analysis.commonPatterns.join(', ')}\n`
+                docInfo += `**📋 Integration Patterns:** ${result.analysis.commonPatterns.join(", ")}\n`
               }
               if (result.analysis.integrationNotes) {
                 docInfo += `**💡 Integration Notes:** ${result.analysis.integrationNotes}\n`
@@ -353,7 +356,7 @@ Focus only on what's needed for this specific use case. Be concise and practical
     instructions += `## Usage\n\`\`\`jsx\nimport ${componentName} from './${componentName}'\n\nfunction App() {\n  return <${componentName} />\n}\n\`\`\`\n\n`
 
     instructions += `## Features\n`
-    
+
     if (hasFetch) {
       instructions += `- 🌐 **API Integration**: Makes HTTP requests to external APIs\n`
     }
@@ -372,7 +375,7 @@ Focus only on what's needed for this specific use case. Be concise and practical
     instructions += `- 🎨 **Origin UI Styled**: Uses beautiful Origin UI design tokens\n`
     instructions += `- 📱 **Responsive Design**: Mobile-friendly responsive layout\n`
     instructions += `- 🌙 **Theme Support**: Compatible with dark/light modes\n`
-    
+
     if (code.includes("loading") || code.includes("isLoading")) {
       instructions += `- ⏳ **Loading States**: Proper loading indicators during API calls\n`
     }
@@ -390,8 +393,8 @@ Focus only on what's needed for this specific use case. Be concise and practical
       instructions += `This component accepts the following props for customization:\n\n`
       instructions += `| Prop Name | Type | Required | Description |\n`
       instructions += `|-----------|------|----------|-------------|\n`
-      componentProps.forEach(prop => {
-        instructions += `| \`${prop.name}\` | \`${prop.type}\` | ${prop.optional ? 'No' : 'Yes'} | ${prop.description} |\n`
+      componentProps.forEach((prop) => {
+        instructions += `| \`${prop.name}\` | \`${prop.type}\` | ${prop.optional ? "No" : "Yes"} | ${prop.description} |\n`
       })
       instructions += `\n### Props Usage Examples\n\n`
       instructions += `\`\`\`jsx\n// Basic usage without props\n<${componentName} />\n\n`
@@ -408,17 +411,17 @@ Focus only on what's needed for this specific use case. Be concise and practical
       instructions += `\`\`\`\n\n`
     }
 
-    instructions += `## Basic Usage\n\`\`\`jsx\nimport ${componentName} from './${componentName}'\n\nfunction App() {\n  return (\n    <div className="p-4">\n      <${componentName}${componentProps.length > 0 ? ' />' : ' />'}\n    </div>\n  )\n}\n\`\`\`\n\n`
+    instructions += `## Basic Usage\n\`\`\`jsx\nimport ${componentName} from './${componentName}'\n\nfunction App() {\n  return (\n    <div className="p-4">\n      <${componentName}${componentProps.length > 0 ? " />" : " />"}\n    </div>\n  )\n}\n\`\`\`\n\n`
 
     instructions += `\n## 🛠️ Installation & Setup\n`
     instructions += `### Step 1: Component Installation\n`
     instructions += `1. Copy the component code to your project (recommended: \`components/${componentName}.tsx\`)\n`
     instructions += `2. Ensure you have the required dependencies installed\n\n`
-    
+
     instructions += `### Step 2: Dependencies\n`
     instructions += `Make sure these packages are installed:\n`
     instructions += `\`\`\`bash\nnpm install react react-dom\nnpm install -D tailwindcss @types/react @types/react-dom\n\`\`\`\n\n`
-    
+
     instructions += `### Step 3: Tailwind CSS Configuration\n`
     instructions += `Ensure Tailwind CSS is configured with Origin UI colors in your \`tailwind.config.js\`:\n`
     instructions += `\`\`\`javascript\nmodule.exports = {\n  content: ["./src/**/*.{js,ts,jsx,tsx}", "./app/**/*.{js,ts,jsx,tsx}"],\n  theme: {\n    extend: {\n      colors: {\n        // Origin UI color tokens (required for proper styling)\n        border: "hsl(var(--border))",\n        background: "hsl(var(--background))",\n        foreground: "hsl(var(--foreground))",\n        primary: {\n          DEFAULT: "hsl(var(--primary))",\n          foreground: "hsl(var(--primary-foreground))",\n        },\n        // ... other Origin UI colors\n      }\n    }\n  },\n  plugins: [],\n}\n\`\`\`\n\n`
@@ -438,60 +441,70 @@ Focus only on what's needed for this specific use case. Be concise and practical
     if (apiEndpointsDetails.length > 0 && !contextualAnalysis) {
       instructions += `## 🌐 Comprehensive API Integration Guide\n\n`
       instructions += `This component integrates with **${apiEndpointsDetails.length} API source(s)**. Here's your complete, beginner-friendly guide:\n\n`
-      
+
       apiEndpointsDetails.forEach((apiDetail, index) => {
         instructions += `### ${index + 1}. ${apiDetail.domain} API Integration\n\n`
-        
+
         if (apiDetail.analysis?.authMethods && apiDetail.analysis.authMethods.length > 0) {
-          instructions += `**🔐 Authentication Required:** ${apiDetail.analysis.authMethods.join(', ')}\n\n`
-          
+          instructions += `**🔐 Authentication Required:** ${apiDetail.analysis.authMethods.join(", ")}\n\n`
+
           // Provide specific auth examples
-          if (apiDetail.analysis.authMethods.includes('Bearer Token') || apiDetail.analysis.authMethods.includes('API Key')) {
+          if (
+            apiDetail.analysis.authMethods.includes("Bearer Token") ||
+            apiDetail.analysis.authMethods.includes("API Key")
+          ) {
             instructions += `**Authentication Setup Examples:**\n`
             instructions += `\`\`\`javascript\n// Method 1: Using Authorization header\nconst headers = {\n  'Authorization': 'Bearer YOUR_TOKEN_HERE',\n  'Content-Type': 'application/json'\n}\n\n// Method 2: Using API key in header\nconst headers = {\n  'X-API-Key': 'YOUR_API_KEY_HERE',\n  'Content-Type': 'application/json'\n}\n\n// Usage in fetch\nconst response = await fetch('https://${apiDetail.domain}/api/endpoint', {\n  method: 'GET',\n  headers: headers\n})\n\`\`\`\n\n`
           }
         }
-        
+
         if (apiDetail.endpoints.length > 0) {
           instructions += `**🔗 Available API Endpoints (${apiDetail.endpoints.length} found):**\n\n`
-          
+
           apiDetail.endpoints.slice(0, 5).forEach((endpoint: string, idx: number) => {
             // Determine HTTP method from endpoint string
-            const method = endpoint.includes('GET') ? 'GET' : 
-                          endpoint.includes('POST') ? 'POST' : 
-                          endpoint.includes('PUT') ? 'PUT' : 
-                          endpoint.includes('DELETE') ? 'DELETE' : 'GET'
-            
-            const cleanEndpoint = endpoint.replace(/(GET|POST|PUT|DELETE)\s+/i, '').trim()
-            const fullUrl = cleanEndpoint.startsWith('http') ? cleanEndpoint : `https://${apiDetail.domain}${cleanEndpoint}`
-            
+            const method = endpoint.includes("GET")
+              ? "GET"
+              : endpoint.includes("POST")
+                ? "POST"
+                : endpoint.includes("PUT")
+                  ? "PUT"
+                  : endpoint.includes("DELETE")
+                    ? "DELETE"
+                    : "GET"
+
+            const cleanEndpoint = endpoint.replace(/(GET|POST|PUT|DELETE)\s+/i, "").trim()
+            const fullUrl = cleanEndpoint.startsWith("http")
+              ? cleanEndpoint
+              : `https://${apiDetail.domain}${cleanEndpoint}`
+
             instructions += `#### Endpoint ${idx + 1}: ${method} ${cleanEndpoint}\n\n`
             instructions += `**Quick Copy-Paste Example:**\n`
-            instructions += `\`\`\`javascript\n// ${method} ${cleanEndpoint}\nconst ${method.toLowerCase()}Data = async () => {\n  try {\n    const response = await fetch('${fullUrl}', {\n      method: '${method}',\n      headers: {\n        'Content-Type': 'application/json',\n        'Authorization': 'Bearer ' + process.env.NEXT_PUBLIC_API_KEY,\n        // Add other required headers here\n      }${method === 'POST' || method === 'PUT' ? ',\n      body: JSON.stringify({\n        // Add your request payload here\n        // Example: { name: "value", id: 123 }\n      })' : ''}\n    })\n    \n    if (!response.ok) {\n      throw new Error(\`HTTP error! status: \${response.status}\`)\n    }\n    \n    const data = await response.json()\n    return data\n  } catch (error) {\n    console.error('API Error:', error)\n    throw error\n  }\n}\n\`\`\`\n\n`
-            
+            instructions += `\`\`\`javascript\n// ${method} ${cleanEndpoint}\nconst ${method.toLowerCase()}Data = async () => {\n  try {\n    const response = await fetch('${fullUrl}', {\n      method: '${method}',\n      headers: {\n        'Content-Type': 'application/json',\n        'Authorization': 'Bearer ' + process.env.NEXT_PUBLIC_API_KEY,\n        // Add other required headers here\n      }${method === "POST" || method === "PUT" ? ',\n      body: JSON.stringify({\n        // Add your request payload here\n        // Example: { name: "value", id: 123 }\n      })' : ""}\n    })\n    \n    if (!response.ok) {\n      throw new Error(\`HTTP error! status: \${response.status}\`)\n    }\n    \n    const data = await response.json()\n    return data\n  } catch (error) {\n    console.error('API Error:', error)\n    throw error\n  }\n}\n\`\`\`\n\n`
+
             // Add React hook usage example
             instructions += `**React Hook Integration:**\n`
             instructions += `\`\`\`jsx\nimport { useState, useEffect } from 'react'\n\nconst MyComponent = () => {\n  const [data, setData] = useState(null)\n  const [loading, setLoading] = useState(false)\n  const [error, setError] = useState(null)\n\n  const fetchData = async () => {\n    setLoading(true)\n    setError(null)\n    try {\n      const result = await ${method.toLowerCase()}Data()\n      setData(result)\n    } catch (err) {\n      setError(err.message)\n    } finally {\n      setLoading(false)\n    }\n  }\n\n  useEffect(() => {\n    fetchData() // Fetch on component mount\n  }, [])\n\n  if (loading) return <div>Loading...</div>\n  if (error) return <div>Error: {error}</div>\n  if (!data) return <div>No data</div>\n\n  return (\n    <div>\n      {/* Render your data here */}\n      <pre>{JSON.stringify(data, null, 2)}</pre>\n    </div>\n  )\n}\n\`\`\`\n\n`
           })
         }
-        
+
         if (apiDetail.analysis?.commonPatterns && apiDetail.analysis.commonPatterns.length > 0) {
-          instructions += `**📋 Integration Patterns Found:** ${apiDetail.analysis.commonPatterns.join(', ')}\n\n`
+          instructions += `**📋 Integration Patterns Found:** ${apiDetail.analysis.commonPatterns.join(", ")}\n\n`
         }
-        
+
         if (apiDetail.analysis?.rateLimit) {
           instructions += `**⚡ Rate Limits:** ${apiDetail.analysis.rateLimit}\n\n`
           instructions += `**Rate Limiting Best Practice:**\n`
           instructions += `\`\`\`javascript\n// Simple rate limiting with delays\nconst delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))\n\nconst rateLimitedFetch = async (url, options) => {\n  await delay(100) // 100ms delay between requests\n  return fetch(url, options)\n}\n\`\`\`\n\n`
         }
-        
+
         if (apiDetail.analysis?.integrationNotes) {
           instructions += `**💡 Integration Notes:** ${apiDetail.analysis.integrationNotes}\n\n`
         }
-        
+
         instructions += `---\n\n`
       })
-      
+
       instructions += `### 🚀 Quick Start Checklist for API Integration\n\n`
       instructions += `Follow this step-by-step checklist to get your API integration working:\n\n`
       instructions += `- [ ] **Step 1:** Sign up for API access at the provider's website\n`
@@ -503,13 +516,12 @@ Focus only on what's needed for this specific use case. Be concise and practical
       instructions += `- [ ] **Step 7:** Implement proper error handling\n`
       instructions += `- [ ] **Step 8:** Add loading states for better UX\n`
       instructions += `- [ ] **Step 9:** Test in production environment\n\n`
-      
+
       instructions += `### 🔧 Development vs Production Configuration\n\n`
       instructions += `**Development Environment:**\n`
-      instructions += `\`\`\`javascript\n// .env.local (for development)\nNEXT_PUBLIC_API_BASE_URL=https://dev-api.${apiEndpointsDetails[0]?.domain || 'example.com'}\nNEXT_PUBLIC_API_KEY=dev_key_here\n\n// In your component\nconst API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL\nconst API_KEY = process.env.NEXT_PUBLIC_API_KEY\n\`\`\`\n\n`
+      instructions += `\`\`\`javascript\n// .env.local (for development)\nNEXT_PUBLIC_API_BASE_URL=https://dev-api.${apiEndpointsDetails[0]?.domain || "example.com"}\nNEXT_PUBLIC_API_KEY=dev_key_here\n\n// In your component\nconst API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL\nconst API_KEY = process.env.NEXT_PUBLIC_API_KEY\n\`\`\`\n\n`
       instructions += `**Production Environment:**\n`
-      instructions += `\`\`\`javascript\n// .env.production (for production)\nNEXT_PUBLIC_API_BASE_URL=https://api.${apiEndpointsDetails[0]?.domain || 'example.com'}\nNEXT_PUBLIC_API_KEY=prod_key_here\n\n// Same component code works in both environments!\n\`\`\`\n\n`
-      
+      instructions += `\`\`\`javascript\n// .env.production (for production)\nNEXT_PUBLIC_API_BASE_URL=https://api.${apiEndpointsDetails[0]?.domain || "example.com"}\nNEXT_PUBLIC_API_KEY=prod_key_here\n\n// Same component code works in both environments!\n\`\`\`\n\n`
     } else if (hasFetch && !contextualAnalysis) {
       instructions += `## 🔗 API Integration Guide\n\n`
       instructions += `This component includes API integration capabilities. Here's what you need to know:\n\n`
@@ -518,10 +530,10 @@ Focus only on what's needed for this specific use case. Be concise and practical
       instructions += `2. **CORS Configuration:** Configure proper CORS settings for external APIs\n`
       instructions += `3. **Authentication:** Add authentication headers if required\n`
       instructions += `4. **Error Handling:** Implement retry strategies and proper error handling\n\n`
-      
+
       instructions += `### Basic API Integration Example\n`
       instructions += `\`\`\`javascript\n// Complete API integration example\nconst [data, setData] = useState(null)\nconst [loading, setLoading] = useState(false)\nconst [error, setError] = useState(null)\n\nconst fetchData = async () => {\n  setLoading(true)\n  setError(null)\n  \n  try {\n    const response = await fetch('/api/your-endpoint', {\n      method: 'GET',\n      headers: {\n        'Content-Type': 'application/json',\n        'Authorization': 'Bearer ' + process.env.NEXT_PUBLIC_API_KEY\n      }\n    })\n    \n    if (!response.ok) {\n      throw new Error(\`HTTP error! status: \${response.status}\`)\n    }\n    \n    const result = await response.json()\n    setData(result)\n  } catch (error) {\n    console.error('Fetch error:', error)\n    setError(error.message)\n  } finally {\n    setLoading(false)\n  }\n}\n\n// Use in component\nuseEffect(() => {\n  fetchData()\n}, [])\n\`\`\`\n\n`
-      
+
       instructions += `### Environment Variables Setup\n`
       instructions += `\`\`\`bash\n# .env.local\nNEXT_PUBLIC_API_URL=https://api.example.com\nNEXT_PUBLIC_API_KEY=your_api_key_here\n\`\`\`\n\n`
     }
@@ -530,15 +542,19 @@ Focus only on what's needed for this specific use case. Be concise and practical
     instructions += `### Styling Customization\n`
     instructions += `The component uses Tailwind CSS classes. Here's how to customize:\n\n`
     instructions += `\`\`\`jsx\n// Change colors (example modifications)\n<div className="bg-blue-500 text-white"> // Instead of default bg-background\n<div className="border-red-500"> // Instead of default border\n<div className="text-green-600"> // Instead of default text color\n\n// Modify spacing\n<div className="p-8 m-4"> // Instead of default padding/margin\n<div className="space-y-6"> // Increase/decrease spacing between elements\n\n// Adjust borders and shadows\n<div className="border-2 shadow-lg rounded-xl"> // Custom borders and shadows\n<div className="ring-2 ring-blue-500"> // Add focus rings\n\`\`\`\n\n`
-    
+
     if (componentProps.length > 0) {
       instructions += `### Props Customization\n`
       instructions += `Use component props to customize behavior and appearance:\n\n`
       instructions += `\`\`\`jsx\n<${componentName}\n`
-      componentProps.forEach((prop: {name: string, type: string, optional: boolean, description: string}) => {
-        const sampleValue = prop.type.includes('string') ? `"your custom value"` : 
-                           prop.type.includes('number') ? `{42}` :
-                           prop.type.includes('boolean') ? `{true}` : `{{}}`
+      componentProps.forEach((prop: { name: string; type: string; optional: boolean; description: string }) => {
+        const sampleValue = prop.type.includes("string")
+          ? `"your custom value"`
+          : prop.type.includes("number")
+            ? `{42}`
+            : prop.type.includes("boolean")
+              ? `{true}`
+              : `{{}}`
         instructions += `  ${prop.name}=${sampleValue}  // ${prop.description}\n`
       })
       instructions += `/>\n\`\`\`\n\n`
@@ -554,7 +570,7 @@ Focus only on what's needed for this specific use case. Be concise and practical
     instructions += `- ✅ Check that your build process includes the component files\n`
     instructions += `- ✅ Verify Origin UI colors are defined in your \`tailwind.config.js\`\n`
     instructions += `- ✅ Make sure CSS is being loaded in your app\n\n`
-    
+
     if (hasFetch) {
       instructions += `**2. 🌐 API calls failing:**\n`
       instructions += `- ✅ Verify API endpoint URLs are correct and accessible\n`
@@ -562,29 +578,29 @@ Focus only on what's needed for this specific use case. Be concise and practical
       instructions += `- ✅ Ensure CORS is properly configured on the API server\n`
       instructions += `- ✅ Check network requests in browser DevTools (Network tab)\n`
       instructions += `- ✅ Verify environment variables are loaded correctly\n\n`
-      
+
       instructions += `**3. 🚫 CORS errors in browser:**\n`
       instructions += `- ✅ Add proper CORS headers on your API server\n`
       instructions += `- ✅ Use a proxy during development (e.g., Next.js API routes)\n`
       instructions += `- ✅ Consider using server-side rendering for API calls\n`
       instructions += `- ✅ Check if API supports JSONP as an alternative\n\n`
-      
+
       instructions += `**4. 🔑 Authentication issues:**\n`
       instructions += `- ✅ Verify API keys are correctly added to environment variables\n`
       instructions += `- ✅ Check token expiration and refresh mechanisms\n`
       instructions += `- ✅ Ensure proper header format (Bearer, API-Key, etc.)\n`
       instructions += `- ✅ Test authentication with API documentation examples\n\n`
     }
-    
+
     if (hasProps) {
-      instructions += `**${hasFetch ? '5' : '2'}. ⚙️ Props not working:**\n`
+      instructions += `**${hasFetch ? "5" : "2"}. ⚙️ Props not working:**\n`
       instructions += `- ✅ Check prop names match exactly (JavaScript is case-sensitive)\n`
       instructions += `- ✅ Verify prop types match component expectations\n`
       instructions += `- ✅ Ensure required props are provided\n`
       instructions += `- ✅ Check for typos in prop names\n\n`
     }
 
-    instructions += `**${hasFetch ? (hasProps ? '6' : '5') : (hasProps ? '3' : '2')}. 📱 Component not rendering:**\n`
+    instructions += `**${hasFetch ? (hasProps ? "6" : "5") : hasProps ? "3" : "2"}. 📱 Component not rendering:**\n`
     instructions += `- ✅ Check browser console for JavaScript errors\n`
     instructions += `- ✅ Verify all required imports are present\n`
     instructions += `- ✅ Ensure React and ReactDOM are properly installed\n`
@@ -635,7 +651,7 @@ Focus only on what's needed for this specific use case. Be concise and practical
     instructions += `- ✅ Troubleshooting guide and debug tools\n`
     instructions += `- ✅ Additional resources for continued learning\n\n`
 
-    instructions += `*🤖 Generated by AI Component Generator with ${apiEndpointsDetails.length > 0 ? 'API Documentation Intelligence' : 'Origin UI'} • ${new Date().toLocaleDateString()} • Ready for production use*`
+    instructions += `*🤖 Generated by AI Component Generator with ${apiEndpointsDetails.length > 0 ? "API Documentation Intelligence" : "Origin UI"} • ${new Date().toLocaleDateString()} • Ready for production use*`
 
     setInstructions(instructions)
   }
@@ -685,7 +701,7 @@ export default ${componentName}
 
     setIsLoading(true)
     setError(null)
-    
+
     // Store the current user request for contextual analysis
     setCurrentUserRequest(input.trim())
 
@@ -807,23 +823,29 @@ export default ${componentName}
 
       // Check if documentation was analyzed and add results to success message
       let successContent = "✅ Component generated successfully! Check the preview →"
-      
+
       if (documentationResults) {
         // Filter out font files from the count
-        const realEndpoints = documentationResults.apiEndpoints?.filter((endpoint: string) => 
-          !endpoint.match(/\.(woff2?|ttf|eot|css|js|png|jpg|jpeg|gif|svg|ico)(\?|$)/i) &&
-          !endpoint.includes('font') &&
-          (endpoint.includes('/api/') || endpoint.includes('GET') || endpoint.includes('POST') || 
-           endpoint.includes('PUT') || endpoint.includes('DELETE') || endpoint.includes('/webhook'))
-        ) || []
-        
+        const realEndpoints =
+          documentationResults.apiEndpoints?.filter(
+            (endpoint: string) =>
+              !endpoint.match(/\.(woff2?|ttf|eot|css|js|png|jpg|jpeg|gif|svg|ico)(\?|$)/i) &&
+              !endpoint.includes("font") &&
+              (endpoint.includes("/api/") ||
+                endpoint.includes("GET") ||
+                endpoint.includes("POST") ||
+                endpoint.includes("PUT") ||
+                endpoint.includes("DELETE") ||
+                endpoint.includes("/webhook")),
+          ) || []
+
         successContent += `\n\n📚 **API Documentation Analyzed:**\n`
         if (realEndpoints.length > 0) {
           successContent += `• Found ${realEndpoints.length} real API endpoints\n`
         } else {
           successContent += `• Documentation analyzed (general API info)\n`
         }
-        
+
         if (documentationResults.authMethod) {
           successContent += `• Authentication: ${documentationResults.authMethod}\n`
         }
@@ -884,6 +906,9 @@ export default ${componentName}
                 <p className="text-sm text-muted-foreground">Component Generator with Gemini 2.0</p>
               </div>
             </div>
+            <div className="ml-auto">
+              <ThemeToggle />
+            </div>
           </div>
         </div>
 
@@ -899,10 +924,12 @@ export default ${componentName}
                 >
                   {message.role === "assistant" && message.content.includes("📚 **API Documentation Analyzed:**") ? (
                     <div className="text-sm leading-relaxed">
-                      <ReactMarkdown 
+                      <ReactMarkdown
                         components={{
                           p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
-                          strong: ({ children }) => <strong className="font-semibold text-foreground">{children}</strong>,
+                          strong: ({ children }) => (
+                            <strong className="font-semibold text-foreground">{children}</strong>
+                          ),
                           ul: ({ children }) => <ul className="ml-4 space-y-1">{children}</ul>,
                           li: ({ children }) => <li className="text-sm">{children}</li>,
                         }}

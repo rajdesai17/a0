@@ -2,8 +2,9 @@
 import { Button } from "@/components/origin-ui/button"
 import { Card } from "@/components/origin-ui/card"
 import { Badge } from "@/components/origin-ui/badge"
-import { ArrowRight, Sparkles, Code, Eye, Zap, Github, Download, Terminal, FileText, Layers, Smartphone } from "lucide-react"
+import { ArrowRight, Sparkles, Eye, Github, Download, Terminal } from "lucide-react"
 import Link from "next/link"
+import ThemeToggle from "@/components/theme-toggle"
 
 export default function LandingPage() {
   return (
@@ -18,6 +19,7 @@ export default function LandingPage() {
             <span className="font-semibold text-foreground">AI Component Generator</span>
           </div>
           <div className="flex items-center gap-3">
+            <ThemeToggle />
             <Button variant="ghost" size="sm" asChild>
               <Link href="https://github.com/rajdesai17/a0" target="_blank">
                 <Github className="w-4 h-4 mr-2" />
@@ -47,7 +49,7 @@ export default function LandingPage() {
           <p className="text-xl text-muted-foreground mb-8 text-pretty max-w-3xl mx-auto">
             Chat, browse docs, and generate production-ready components — fast, clean, and previewed live.
           </p>
-          
+
           {/* Tech Stack */}
           <div className="flex flex-wrap justify-center gap-2 mb-8">
             <Badge variant="outline">Next.js 15</Badge>
