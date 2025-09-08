@@ -893,12 +893,6 @@ export default ${componentName}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm z-50">
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="sm" className="rounded-full" asChild>
-              <Link href="/landing">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Landing
-              </Link>
-            </Button>
             <div className="w-8 h-8 bg-primary rounded-xl flex items-center justify-center shadow-sm">
               <Sparkles className="w-4 h-4 text-primary-foreground" />
             </div>
