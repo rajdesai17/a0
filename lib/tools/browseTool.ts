@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { scrapeUrl } from '@/lib/scrapeUtils'
 
 function analyzeDocumentation(content: string, apiEndpoints: string[] = [], focus?: string): {
   summary: string;
@@ -94,62 +95,38 @@ export async function browseTool({ urls, focus }: { urls: string[], focus?: stri
 
   const results = []
 
-  for (const url of urls.slice(0, 3)) { // Limit to 3 URLs to avoid timeouts
+    for (const url of urls.slice(0, 3)) { // Limit to 3 URLs to avoid timeouts
       try {
         console.log(`Scraping: ${url}`)
         
-        // Use full URL for server-side fetch
-        const baseUrl = process.env.NODE_ENV === 'development' 
-          ? 'http://localhost:3000' 
-          : process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+        // Use the shared scraping utility directly
+        const scrapedData = await scrapeUrl(url)
         
-        const response = await fetch(`${baseUrl}/api/scrape`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ url }),
-        })
-
-        if (!response.ok) {
-        const errorData = await response.json()
+        // Analyze the content for API-specific information
+        const analysis = analyzeDocumentation(scrapedData.content, scrapedData.apiEndpoints, focus)
+        
         results.push({
           url,
-          error: `Failed to scrape: ${errorData.error || 'Unknown error'}`,
+          title: scrapedData.title,
+          content: scrapedData.content,
+          apiEndpoints: scrapedData.apiEndpoints,
+          codeExamples: scrapedData.codeExamples,
+          analysis,
+          wordCount: scrapedData.wordCount,
+          success: true,
+        })
+
+        console.log(`Successfully scraped: ${url} (${scrapedData.wordCount} words)`)
+        
+      } catch (error) {
+        console.error(`Error scraping ${url}:`, error)
+        results.push({
+          url,
+          error: `Scraping failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
           success: false,
         })
-        continue
       }
-
-      const scrapedData = await response.json()
-      
-      // Analyze the content for API-specific information
-      const analysis = analyzeDocumentation(scrapedData.content, scrapedData.apiEndpoints, focus)
-      
-      results.push({
-        url,
-        title: scrapedData.title,
-        content: scrapedData.content,
-        apiEndpoints: scrapedData.apiEndpoints,
-        codeExamples: scrapedData.codeExamples,
-        analysis,
-        wordCount: scrapedData.wordCount,
-        success: true,
-      })
-
-      console.log(`Successfully scraped: ${url} (${scrapedData.wordCount} words)`)
-      
-    } catch (error) {
-      console.error(`Error scraping ${url}:`, error)
-      results.push({
-        url,
-        error: `Scraping failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        success: false,
-      })
-    }
-  }
-
-  const successful = results.filter(r => r.success)
+    }  const successful = results.filter(r => r.success)
 
   // Generate summary
   const summary = {
@@ -178,7 +155,7 @@ ${result.apiEndpoints?.slice(0, 10).map((ep: string) => `- ${ep}`).join('\n') ||
 ${analysis.integrationNotes}
 
 **Content Preview:**
-${result.content.substring(0, 1000)}${result.content.length > 1000 ? '...' : ''}
+${result.content ? result.content.substring(0, 1000) + (result.content.length > 1000 ? '...' : '') : 'No content available'}
 `
   }).join('\n\n---\n\n')
 

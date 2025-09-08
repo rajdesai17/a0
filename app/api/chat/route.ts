@@ -27,7 +27,7 @@ export async function POST(req: Request) {
     const urls = latestMessage.content.match(urlRegex) || []
     
     let documentationContext = ''
-    let browsingMessage = ''
+    let browsingResults = null
 
     // If URLs are detected, use browse tool to analyze them
     if (urls.length > 0 && latestMessage.role === 'user') {
@@ -36,14 +36,21 @@ export async function POST(req: Request) {
         const browsingResult = await browseTool({ urls })
         if (browsingResult.success) {
           documentationContext = browsingResult.documentationContext
-          browsingMessage = `\n\n📚 **Documentation Analysis:**\n${browsingResult.message}\n\n`
+          browsingResults = browsingResult // Store for instructions generation
           console.log('Successfully browsed URLs, context length:', documentationContext.length)
+          
+          // Store results for the instructions tab
+          await fetch(`${process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : ''}/api/documentation`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ urls, results: browsingResult })
+          }).catch(err => console.log('Failed to store doc results:', err))
+          
         } else {
-          browsingMessage = `\n\n⚠️ **Browsing Error:** Could not analyze the provided URLs.\n\n`
+          console.log('Browsing failed')
         }
       } catch (error) {
         console.error('Error browsing URLs:', error)
-        browsingMessage = `\n\n⚠️ **Browsing Error:** ${error instanceof Error ? error.message : 'Unknown error'}\n\n`
       }
     }
 
@@ -73,6 +80,7 @@ CRITICAL REQUIREMENTS:
 6. Always end your response with: window.default = ComponentName;
 7. **INCLUDE API INTEGRATION** - Use fetch() calls to integrate with the documented APIs
 8. Add proper error handling, loading states, and TypeScript interfaces for API responses
+9. **ADD COMMENTS** in your code indicating which API endpoints are being used and what they do
 
 ORIGIN UI DESIGN PATTERNS TO USE:
 - Colors: Use bg-background, text-foreground, bg-card, text-card-foreground, bg-primary, text-primary-foreground

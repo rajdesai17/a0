@@ -1,5 +1,5 @@
 "use client"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import type React from "react"
 
 import { Button } from "@/components/ui/button"
@@ -59,18 +59,81 @@ window.default = WelcomeComponent;`)
     return functionMatch?.[1] || constMatch?.[1] || "Component"
   }
 
-  // Generate component instructions
-  const generateInstructions = (code: string): string => {
+  // State for documentation results
+  const [documentationResults, setDocumentationResults] = useState<any>(null)
+  const [instructions, setInstructions] = useState<string>("")
+
+  // Generate component instructions with API documentation details
+  const generateInstructions = async (code: string): Promise<void> => {
     const componentName = extractComponentName(code)
     const hasState = code.includes("useState")
     const hasProps = code.includes("props") || code.includes(": {") || code.includes("interface")
     const hasInteractivity = code.includes("onClick") || code.includes("onSubmit") || code.includes("onChange")
+    const hasFetch = code.includes("fetch(") || code.includes("fetch ")
+    const hasAPI = code.includes("/api/") || code.includes("http")
 
     let instructions = `# ${componentName} Component\n\n`
-    instructions += `## Overview\nA React functional component built with Origin UI design patterns and Tailwind CSS.\n\n`
+    
+    // Check for documentation results
+    let docInfo = ""
+    try {
+      const docResponse = await fetch('/api/documentation')
+      const docData = await docResponse.json()
+      if (docData.hasDocumentation && docData.results) {
+        setDocumentationResults(docData.results)
+        const results = docData.results.results?.filter((r: any) => r.success) || []
+        
+        if (results.length > 0) {
+          docInfo = `\n## 📚 API Documentation Analysis\n\n`
+          docInfo += `**URLs Analyzed:** ${results.length}\n\n`
+          
+          results.forEach((result: any, index: number) => {
+            const domain = new URL(result.url).hostname
+            docInfo += `### ${index + 1}. ${result.title || domain}\n`
+            docInfo += `**URL:** [${result.url}](${result.url})\n`
+            docInfo += `**Content:** ${result.wordCount || 0} words analyzed\n`
+            
+            if (result.apiEndpoints && result.apiEndpoints.length > 0) {
+              docInfo += `**API Endpoints Found:** ${result.apiEndpoints.length}\n`
+              docInfo += `\`\`\`\n${result.apiEndpoints.slice(0, 5).join('\n')}\n\`\`\`\n`
+            }
+            
+            if (result.analysis) {
+              docInfo += `**Integration Notes:** ${result.analysis.integrationNotes}\n`
+              if (result.analysis.authMethods && result.analysis.authMethods.length > 0) {
+                docInfo += `**Authentication:** ${result.analysis.authMethods.join(', ')}\n`
+              }
+              if (result.analysis.commonPatterns && result.analysis.commonPatterns.length > 0) {
+                docInfo += `**Patterns:** ${result.analysis.commonPatterns.join(', ')}\n`
+              }
+            }
+            docInfo += `\n`
+          })
+        }
+      }
+    } catch (error) {
+      console.log('No documentation data available')
+    }
+
+    instructions += `## Overview\n`
+    if (hasFetch && hasAPI) {
+      instructions += `A React functional component with **API integration** built using Origin UI design patterns and Tailwind CSS. This component includes real API calls and data handling.\n\n`
+    } else {
+      instructions += `A React functional component built with Origin UI design patterns and Tailwind CSS.\n\n`
+    }
+
+    instructions += docInfo
+
     instructions += `## Usage\n\`\`\`jsx\nimport ${componentName} from './${componentName}'\n\nfunction App() {\n  return <${componentName} />\n}\n\`\`\`\n\n`
 
     instructions += `## Features\n`
+    
+    if (hasFetch) {
+      instructions += `- 🌐 **API Integration**: Makes HTTP requests to external APIs\n`
+    }
+    if (hasAPI) {
+      instructions += `- 🔗 **Live Data**: Connects to real API endpoints for dynamic content\n`
+    }
     instructions += hasState
       ? `- ✅ **Interactive State Management**: Uses React useState hooks\n`
       : `- 📋 **Static Component**: No internal state management\n`
@@ -82,17 +145,47 @@ window.default = WelcomeComponent;`)
       : `- 📋 **Self Contained**: No external props required\n`
     instructions += `- 🎨 **Origin UI Styled**: Uses beautiful Origin UI design tokens\n`
     instructions += `- 📱 **Responsive Design**: Mobile-friendly responsive layout\n`
-    instructions += `- 🌙 **Theme Support**: Compatible with dark/light modes\n\n`
+    instructions += `- 🌙 **Theme Support**: Compatible with dark/light modes\n`
+    
+    if (code.includes("loading") || code.includes("isLoading")) {
+      instructions += `- ⏳ **Loading States**: Proper loading indicators during API calls\n`
+    }
+    if (code.includes("error") || code.includes("Error")) {
+      instructions += `- ❌ **Error Handling**: Graceful error handling and user feedback\n`
+    }
+    if (code.includes("interface") || code.includes("type ")) {
+      instructions += `- 📝 **TypeScript Support**: Includes proper type definitions\n`
+    }
 
-    instructions += `## Installation\n`
+    instructions += `\n## Installation\n`
     instructions += `1. Copy the component code to your project\n`
     instructions += `2. Ensure Tailwind CSS is configured with Origin UI colors\n`
-    instructions += `3. Import and use in your React application\n\n`
+    if (hasFetch) {
+      instructions += `3. Configure any required API keys or endpoints\n`
+      instructions += `4. Handle CORS settings if needed for API calls\n`
+      instructions += `5. Import and use in your React application\n\n`
+    } else {
+      instructions += `3. Import and use in your React application\n\n`
+    }
 
-    instructions += `---\n*Generated by AI Component Generator with Origin UI*`
+    if (hasFetch) {
+      instructions += `## API Integration Notes\n`
+      instructions += `This component includes API integration. Please note:\n`
+      instructions += `- Ensure API endpoints are accessible from your domain\n`
+      instructions += `- Configure proper CORS settings if calling external APIs\n`
+      instructions += `- Add authentication headers if required by the API\n`
+      instructions += `- Consider rate limiting and error retry strategies\n\n`
+    }
 
-    return instructions
+    instructions += `---\n*Generated by AI Component Generator with ${docInfo ? 'API Documentation Intelligence' : 'Origin UI'}*`
+
+    setInstructions(instructions)
   }
+
+  // Regenerate instructions when code changes
+  useEffect(() => {
+    generateInstructions(generatedCode)
+  }, [generatedCode])
 
   // Download component as file
   const downloadComponent = () => {
@@ -432,7 +525,7 @@ export default ${componentName}
                       },
                     }}
                   >
-                    {generateInstructions(generatedCode)}
+                    {instructions}
                   </ReactMarkdown>
                 </div>
               </div>
