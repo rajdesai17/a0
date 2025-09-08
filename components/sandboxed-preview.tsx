@@ -125,32 +125,38 @@ export function SandboxedPreview({ code }: SandboxedPreviewProps) {
     
     body {
       margin: 0;
-      padding: 20px;
+      padding: 16px;
       font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
       background: hsl(var(--background));
       color: hsl(var(--foreground));
       min-height: 100vh;
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
       box-sizing: border-box;
-      overflow-y: auto;
-      overflow-x: auto;
+      overflow: auto;
+      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none; /* IE/Edge */
+    }
+    
+    body::-webkit-scrollbar {
+      display: none; /* Chrome/Safari/Webkit */
     }
     
     #root {
       width: 100%;
       max-width: 100%;
       margin: 0 auto;
-      display: block;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
       box-sizing: border-box;
+      min-height: calc(100vh - 32px);
       padding: 20px 0;
     }
     
-    /* Ensure components scale properly */
+    /* Ensure components scale properly and are centered */
     #root > * {
       max-width: 100%;
-      margin: 0 auto;
+      width: fit-content;
     }
     
     html {
@@ -158,19 +164,21 @@ export function SandboxedPreview({ code }: SandboxedPreviewProps) {
       -ms-overflow-style: none; /* IE/Edge */
       box-sizing: border-box;
       font-size: 16px; /* Ensure proper font scaling */
+      height: 100%;
     }
     
     html::-webkit-scrollbar {
       display: none; /* Chrome/Safari/Webkit */
     }
     
-    body::-webkit-scrollbar {
-      display: none; /* Chrome/Safari/Webkit */
-    }
-    
+    /* Hide all scrollbars */
     * {
       scrollbar-width: none; /* Firefox */
       -ms-overflow-style: none; /* IE/Edge */
+    }
+    
+    *::-webkit-scrollbar {
+      display: none; /* Chrome/Safari/Webkit */
     }
     
     *::-webkit-scrollbar {
@@ -278,23 +286,22 @@ export function SandboxedPreview({ code }: SandboxedPreviewProps) {
   }, [])
 
   return (
-    <Card className="h-full overflow-hidden rounded-xl border-border/50 shadow-sm">
+    <Card className="h-full overflow-hidden rounded-xl border-border/50 shadow-sm flex flex-col">
       {error && (
-        <div className="p-4 bg-destructive/10 border-b border-destructive/20">
+        <div className="p-4 bg-destructive/10 border-b border-destructive/20 flex-shrink-0">
           <p className="text-sm text-destructive font-mono">{error}</p>
         </div>
       )}
       <iframe 
         ref={iframeRef} 
-        className="w-full h-full border-0" 
+        className="w-full flex-1 border-0 min-h-0" 
         sandbox="allow-scripts allow-same-origin" 
         title="Component Preview"
         style={{
           scrollbarWidth: 'none',
           msOverflowStyle: 'none',
-          transform: 'scale(1)',
-          transformOrigin: 'top left',
-          minHeight: '600px'
+          minHeight: '500px',
+          height: '100%'
         }}
       />
     </Card>
