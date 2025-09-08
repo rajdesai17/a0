@@ -10,7 +10,7 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
+      <header className="border-b border-border bg-card/50 backdrop-blur-sm fixed top-0 left-0 right-0 z-50">
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-primary rounded-xl flex items-center justify-center shadow-sm">
@@ -25,19 +25,13 @@ export default function LandingPage() {
                 View Repo
               </Link>
             </Button>
-            <Button asChild>
-              <Link href="/chat">
-                Try Demo
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Link>
-            </Button>
             <ThemeToggle />
           </div>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="container mx-auto px-4 py-16 text-center">
+      <section className="container mx-auto px-4 py-16 pt-32 text-center">
         <div className="max-w-4xl mx-auto">
           <Badge variant="secondary" className="mb-6">
             <Sparkles className="w-3 h-3 mr-1" />

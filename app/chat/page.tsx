@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Send, Code, Eye, Sparkles, Download, FileText, ArrowLeft, Github, ArrowRight } from "lucide-react"
+import { Send, Code, Eye, Sparkles, Download, FileText, Github, ArrowRight } from "lucide-react"
 import CodeMirror from "@uiw/react-codemirror"
 import { javascript } from "@codemirror/lang-javascript"
 import { oneDark } from "@codemirror/theme-one-dark"
@@ -890,7 +890,7 @@ export default ${componentName}
   return (
     <div className="h-screen flex flex-col bg-background overflow-hidden">
       {/* Header/Navbar */}
-      <header className="border-b border-border bg-card/50 backdrop-blur-sm z-50">
+      <header className="border-b border-border bg-card/50 backdrop-blur-sm fixed top-0 left-0 right-0 z-50">
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-primary rounded-xl flex items-center justify-center shadow-sm">
@@ -899,12 +899,6 @@ export default ${componentName}
             <span className="font-semibold text-lg text-foreground">AI Component Generator</span>
           </div>
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="sm" asChild>
-              <Link href="/landing">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back
-              </Link>
-            </Button>
             <Button variant="ghost" size="sm" asChild>
               <Link href="https://github.com/rajdesai17/a0" target="_blank">
                 <Github className="w-4 h-4 mr-2" />
@@ -917,7 +911,7 @@ export default ${componentName}
       </header>
 
       {/* Main Content - Split Screen with rounded corners */}
-      <div className="flex-1 flex bg-background p-4 gap-4 overflow-hidden">
+      <div className="flex-1 flex bg-background p-4 gap-4 overflow-hidden pt-20">
         {/* Left Panel - Chat */}
         <div className="w-1/2 flex flex-col bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
           {/* Chat Header */}
