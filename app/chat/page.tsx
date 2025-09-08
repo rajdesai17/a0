@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Send, Code, Eye, Sparkles, Download, FileText, ArrowLeft } from "lucide-react"
+import { Send, Code, Eye, Sparkles, Download, FileText, ArrowLeft, Globe } from "lucide-react"
 import CodeMirror from "@uiw/react-codemirror"
 import { javascript } from "@codemirror/lang-javascript"
 import { oneDark } from "@codemirror/theme-one-dark"
@@ -32,6 +32,21 @@ export default function ChatPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [downloadSuccess, setDownloadSuccess] = useState(false)
+  const [detectedUrls, setDetectedUrls] = useState<string[]>([])
+
+  // URL detection function
+  const detectUrls = (text: string): string[] => {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    return text.match(urlRegex) || [];
+  }
+
+  // Update detected URLs when input changes
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    setInput(newValue);
+    const urls = detectUrls(newValue);
+    setDetectedUrls(urls);
+  }
 
   const [generatedCode, setGeneratedCode] = useState(`function WelcomeComponent() {
   return (
@@ -290,11 +305,27 @@ export default ${componentName}
 
         {/* Input */}
         <div className="p-4 border-t border-border">
+          {/* URL Preview */}
+          {detectedUrls.length > 0 && (
+            <div className="mb-3 p-3 bg-accent/50 rounded-md">
+              <p className="text-sm text-muted-foreground mb-2">Detected URLs:</p>
+              {detectedUrls.map((url, idx) => (
+                <div key={idx} className="flex items-center gap-2 text-sm">
+                  <Globe className="w-3 h-3 text-primary" />
+                  <span className="text-foreground truncate">{url}</span>
+                </div>
+              ))}
+              <p className="text-xs text-muted-foreground mt-2">
+                💡 I'll browse these URLs to understand the API documentation
+              </p>
+            </div>
+          )}
+          
           <form onSubmit={handleSubmit} className="flex gap-2">
             <Input
               value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Describe the component you want to create..."
+              onChange={handleInputChange}
+              placeholder="Describe the component or paste documentation URLs..."
               className="flex-1"
               disabled={isLoading}
             />
