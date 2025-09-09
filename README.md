@@ -1,10 +1,29 @@
 # a0 - AI Component Studio
 
-## 📝 TL;DR
+## Overview
 
-**a0** is an AI-powered React component generator that creates professional, production-ready components by analyzing multiple API documentations simultaneously. Simply describe what you want or provide documentation URLs, and get a complete component with code, preview, and integration instructions.
+**a0** is an AI-powered React component generator that creates production-ready components by analyzing API documentation in real-time. Built with **Next.js 15**, **AI SDK v5**, **Google Gemini 2.5 Flash**, and **Origin UI**.
 
-🚀 **Quick Example**: "create a pricing card integrated with https://stripe.com/docs https://supabase.com/docs" → Get a fully integrated component in seconds
+## Snapshots
+
+<p align="center">
+  <img width="800" alt="image" src="https://github.com/user-attachments/assets/1b6577a3-5c3e-4a0e-81f3-701159f23a6c" />
+</p>
+
+<p align="center">
+  <img width="260" alt="image" src="https://github.com/user-attachments/assets/da2eb925-9e31-4b6e-9d6c-041508e015a1" />
+  <img width="260" alt="image" src="https://github.com/user-attachments/assets/2d16659c-7dc0-47a1-a5bb-143ca51cae43" />
+  <img width="260" alt="image" src="https://github.com/user-attachments/assets/87cef22c-7125-42fc-a260-9e7084929c32" />
+</p>
+
+<p align="center">
+  <img width="800" alt="image" src="https://github.com/user-attachments/assets/a581eb4d-1000-4f21-8fd3-d09cc599f90a" />
+</p>
+
+<p align="center">
+  <img width="400" alt="image" src="https://github.com/user-attachments/assets/792b2c84-f396-4dfa-9cfc-2e0e4177d361" />
+  <img width="400" alt="image" src="https://github.com/user-attachments/assets/e519f227-6953-41c9-be9e-f2e1e2fde57f" />
+</p>
 
 ---
 
@@ -22,23 +41,7 @@
 - 🎨 **Origin UI Design**: Professional, accessible components with modern design
 - ⚡ **Production Ready**: TypeScript, error handling, and best practices built-in
 
-**Tech Stack**: Next.js 14 + AI SDK v5.0.34 + Google Gemini 2.5 Flash + Origin UI + TypeScript
-
-<table>
-  <tr>
-    <td><img width="100%" alt="image" src="https://github.com/user-attachments/assets/6c2d2c96-03a8-4960-acfe-347ca53fc274" /></td>
-    <td><img width="100%" alt="image" src="https://github.com/user-attachments/assets/a176259f-aa0c-4bbf-bab0-dde792081f2b" /></td>
-  </tr>
-</table>
-
-## 🖼️ Screenshots
-
-<table>
-  <tr>
-    <td><img width="100%" alt="image" src="https://github.com/user-attachments/assets/6c2d2c96-03a8-4960-acfe-347ca53fc274" /></td>
-    <td><img width="100%" alt="image" src="https://github.com/user-attachments/assets/a176259f-aa0c-4bbf-bab0-dde792081f2b" /></td>
-  </tr>
-</table>
+**Tech Stack**: Next.js 15 + AI SDK v5.0.34 + Google Gemini 2.5 Flash + Origin UI + TypeScript
 
 ## 🚀 How It Works
 
@@ -55,14 +58,40 @@
 "create a data table with Supabase integration"
 ```
 
-## 🛠️ Quick Start
+## 🧠 Smart Content Filtering (NEW!)
+
+**a0** now features intelligent content filtering that understands your specific component needs:
+
+### 🎯 **How Smart Filtering Works**
+```bash
+User Request: "create a pricing component"
+↓
+Topic Extraction: ["pricing", "payment", "subscription", "billing"]
+↓  
+Smart Crawling: Targets /pricing, /billing, /docs/payments sections
+↓
+Content Filtering: Filters 2,000+ words → 500 highly relevant words
+↓
+AI Generation: Receives precisely relevant context for better components
+```
+
+### 📊 **Results**
+- **85% more relevant** content compared to basic scraping
+- **60-80% reduction** in content noise
+- **Faster processing** due to focused context
+- **Better components** with accurate API integration
+
+---
+
+## 1. Setup & Installation
 
 ### Prerequisites
-
-- Node.js 18+ and pnpm (recommended)
+- Node.js 18+
+- pnpm (recommended)
 - Google AI Studio API key
+- Firecrawl API key (optional - for enhanced web scraping)
 
-### Installation
+### Steps
 
 ```bash
 # Clone and install
@@ -70,47 +99,84 @@ git clone https://github.com/rajdesai17/v0-split-screen-chaty.git
 cd v0-split-screen-chaty
 pnpm install
 
-# Set up environment
+# Setup environment
 cp .env.example .env.local
 # Add your GOOGLE_GENERATIVE_AI_API_KEY to .env.local
+# Optionally add FIRECRAWL_API_KEY for enhanced web scraping
 
-# Run the app
+# Run locally
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) and start creating components!
+Open http://localhost:3000
 
-## ⚙️ Environment Setup
+### Environment Configuration
 
-Create `.env.local` in the root directory:
+Create a `.env.local` file in the root directory:
 
 ```env
 GOOGLE_GENERATIVE_AI_API_KEY=your_api_key_here
 FIRECRAWL_API_KEY=your_firecrawl_key_here # Optional: For enhanced scraping
 ```
 
-## 📖 Usage Examples
+## 2. Example Usage
 
-### Basic Components
+You can describe components directly or provide API docs for integration.
+
+**Basic Components:**
+
 ```
 "create a modern pricing card"
 "build a contact form with validation" 
 "design a hero section with call-to-action"
 ```
 
-### API-Integrated Components  
+**Based on API Docs:**
+
 ```
+"create a pricing card integrated with http://billingsdk.com/ http://dodopayments.com/"
 "create a user profile with Supabase authentication"
 "build a payment form integrated with Stripe"
 "design a dashboard with real-time data from Firebase"
 ```
 
-### Advanced Components
+**Advanced Components:**
+
 ```
 "create a multi-step form with progress tracking"
 "build a data visualization dashboard with charts"
 "design a e-commerce product catalog with filtering"
 ```
+
+## 3. Why Origin UI?
+
+We chose **Origin UI** over shadcn (as required) because it:
+- Provides modern, accessible design tokens and prebuilt patterns
+- Is less overused, making component outputs more unique
+- Integrates smoothly with TailwindCSS and TypeScript
+
+All generated components follow Origin UI conventions with full type safety.
+
+## 4. Tools, Workflows & Trade-offs
+
+**Tools & Stack:**
+- **Next.js 15 (App Router)** → scalable architecture
+- **AI SDK v5** → orchestration + tool integration
+- **Gemini 2.5 Flash** → fast, reliable LLM generation
+- **Origin UI + TailwindCSS** → design system & styling
+- **CodeMirror 6** → syntax highlighting
+- **Firecrawl** → enhanced web scraping and crawling
+
+**Workflows:**
+- Real-time streaming chat (split-screen: chat + preview)
+- Multi-API Fetch URLs with parallel scraping
+- Context passed into AI for accurate code generation
+- Auto-generated usage docs for each component
+
+**Trade-offs:**
+- Focused on Origin UI → limits flexibility for teams preferring other UI libraries
+- Crawling can be rate-limited depending on the docs' protection
+- Preview runs in iframe sandbox → safer, but slightly slower rendering
 
 ## 🎯 Core Features
 
@@ -142,32 +208,7 @@ FIRECRAWL_API_KEY=your_firecrawl_key_here # Optional: For enhanced scraping
 - **Tab system** - Preview | Code | Instructions
 - **Auto-generated documentation** with installation guides
 
-## � Smart Content Filtering (NEW!)
-
-**a0** now features intelligent content filtering that understands your specific component needs:
-
-### 🎯 **How Smart Filtering Works**
-```bash
-User Request: "create a pricing component"
-↓
-Topic Extraction: ["pricing", "payment", "subscription", "billing"]
-↓  
-Smart Crawling: Targets /pricing, /billing, /docs/payments sections
-↓
-Content Filtering: Filters 2,000+ words → 500 highly relevant words
-↓
-AI Generation: Receives precisely relevant context for better components
-```
-
-### 📊 **Results**
-- **85% more relevant** content compared to basic scraping
-- **60-80% reduction** in content noise
-- **Faster processing** due to focused context
-- **Better components** with accurate API integration
-
----
-
-## �🧪 Verified Multi-API Examples
+## 🧪 Verified Multi-API Examples
 
 ```bash
 # Example 1: Billing & Payments Integration
@@ -190,75 +231,21 @@ User Input → URL Detection → Parallel Scraping → Content Analysis → AI G
 - `app/chat/page.tsx` - Main split-screen interface
 - `app/api/chat/route.ts` - AI chat endpoint with multi-API integration
 - `lib/scrapeUtils.ts` - Web scraping with Firecrawl integration and fetch fallback
-- `lib/tools/browseTool.ts` - Multi-API browser tool
+- `lib/tools/browseTool.ts` - Multi-API browser tool with smart filtering
 - `components/navbar.tsx` - Reusable navigation component
 
-## 🚀 Quick Start
-
-### Prerequisites
-- Node.js 18+ and pnpm (recommended)
-- Google AI Studio API key  
-- Firecrawl API key (optional - for enhanced web scraping)
-
-### Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/rajdesai17/v0-split-screen-chaty.git
-cd v0-split-screen-chaty
-
-# Install dependencies
-pnpm install
-
-# Set up environment variables
-cp .env.example .env.local
-# Add your GOOGLE_GENERATIVE_AI_API_KEY to .env.local
-# Optionally add FIRECRAWL_API_KEY for enhanced web scraping
-
-# Start development server
-pnpm dev
-```
-
-### Environment Configuration
-
-Create a `.env.local` file in the root directory:
-
-```env
-GOOGLE_GENERATIVE_AI_API_KEY=your_api_key_here
-FIRECRAWL_API_KEY=your_firecrawl_key_here # Optional: For enhanced scraping
-```
-
-## 🎮 Usage Examples
-
-### Basic Component Generation
-```
-"create a modern pricing card component"
-```
-
-### Multi-API Integration
-```
-"create a dashboard integrated with https://api.stripe.com/docs https://docs.supabase.com/"
-```
-
-### Specific Component Types
-```
-"build a user profile form with validation using React Hook Form"
-"create a data table with sorting and filtering"
-"design a checkout flow with payment integration"
-```
-
-## 🎛️ Features
+## Features
 
 - **🤖 AI-Powered**: Google Gemini 2.5 Flash generates intelligent, context-aware components
 - **🌐 Multi-API**: Analyze multiple documentation sources simultaneously  
 - **👀 Live Preview**: Real-time component preview with split-screen interface
-- **� Smart Docs**: Auto-generated installation guides and usage instructions
+- **📚 Smart Docs**: Auto-generated installation guides and usage instructions
 - **🎨 Professional Design**: Origin UI components with modern styling
 - **⚡ Production Ready**: TypeScript, error handling, and best practices
 - **📱 Responsive**: Works on desktop, tablet, and mobile
 - **🔧 Customizable**: Easy to modify and extend components
 
-## � Project Structure
+## 📁 Project Structure
 
 ```
 a0-component-studio/
@@ -272,7 +259,7 @@ a0-component-studio/
 
 We welcome contributions! Please feel free to submit issues and pull requests.
 
-## � License
+## 📄 License
 
 This project is licensed under the MIT License.
 
@@ -282,6 +269,7 @@ This project is licensed under the MIT License.
 - Origin UI for beautiful component library
 - Vercel AI SDK for seamless AI integration
 - Next.js team for the amazing framework
+- Firecrawl for enhanced web scraping capabilities
 
 ---
 
