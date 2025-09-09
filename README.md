@@ -273,6 +273,6 @@ This project is licensed under the MIT License.
 
 ---
 
-**Built with ❤️ by the a0 team**
+**Built with ❤️**
 
 > 📋 **For detailed technical documentation, see [PROJECT_COMPLETION_REPORT.md](./PROJECT_COMPLETION_REPORT.md)**
