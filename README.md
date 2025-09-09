@@ -42,7 +42,7 @@
 ## 🚀 How It Works
 
 1. **Describe Your Component**: Tell a0 what you want to build
-2. **Add Documentation URLs** (optional): Include API docs for integration
+2. **Add Documentation URLs** (optional): Include API docs for enhanced scraping with Firecrawl
 3. **Get Your Component**: Receive code, preview, and instructions instantly
 
 ## 💡 Example Usage
@@ -119,9 +119,11 @@ FIRECRAWL_API_KEY=your_firecrawl_key_here # Optional: For enhanced scraping
 - **Message persistence** with conversation history
 - **Professional UI** using Origin UI design system
 
-### 🌐 Multi-API Documentation Browser
-- **Parallel scraping** of multiple documentation sources
-- **Anti-bot measures** with realistic headers and timeouts
+### 🌐 Enhanced Documentation Intelligence
+- **Smart scraping** - automatically detects documentation sites for comprehensive crawling
+- **Site-wide crawling** with Firecrawl for complete documentation coverage
+- **Parallel scraping** of multiple documentation sources with intelligent fallbacks
+- **Anti-bot measures** with realistic headers and advanced proxy rotation
 - **Intelligent analysis** - extracts API endpoints, auth methods, integration patterns
 - **Context integration** - passes full documentation context to AI
 
@@ -159,7 +161,7 @@ User Input → URL Detection → Parallel Scraping → Content Analysis → AI G
 
 - `app/chat/page.tsx` - Main split-screen interface
 - `app/api/chat/route.ts` - AI chat endpoint with multi-API integration
-- `lib/scrapeUtils.ts` - Web scraping utilities with anti-bot measures
+- `lib/scrapeUtils.ts` - Web scraping with Firecrawl integration and fetch fallback
 - `lib/tools/browseTool.ts` - Multi-API browser tool
 - `components/navbar.tsx` - Reusable navigation component
 
@@ -167,7 +169,8 @@ User Input → URL Detection → Parallel Scraping → Content Analysis → AI G
 
 ### Prerequisites
 - Node.js 18+ and pnpm (recommended)
-- Google AI Studio API key
+- Google AI Studio API key  
+- Firecrawl API key (optional - for enhanced web scraping)
 
 ### Installation
 
@@ -182,6 +185,7 @@ pnpm install
 # Set up environment variables
 cp .env.example .env.local
 # Add your GOOGLE_GENERATIVE_AI_API_KEY to .env.local
+# Optionally add FIRECRAWL_API_KEY for enhanced web scraping
 
 # Start development server
 pnpm dev
