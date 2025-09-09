@@ -728,69 +728,30 @@ export default ${componentName}
     setMessages((prev) => [...prev, newMessage])
     setInput("")
 
-    // Check for URLs in the message
+    // Check for URLs in the message for status display
     const urlRegex = /(https?:\/\/[^\s]+)/gi
     const urls = input.match(urlRegex) || []
-    
-    let documentationContext = null
-    
-    // Step 1: If URLs detected, scrape and analyze documentation first
-    if (urls.length > 0) {
-      try {
-        console.log('📚 Analyzing documentation from URLs:', urls)
-        
-        // Scrape documentation
-        const scrapeResponse = await fetch('/api/scrape', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ urls })
-        })
-        
-        if (scrapeResponse.ok) {
-          const scrapeData = await scrapeResponse.json()
-          console.log('📄 Documentation scraped successfully')
-          
-          // AI analysis of scraped documentation for context understanding
-          const analysisResult = await analyzeDocumentationContext(scrapeData.results || scrapeData, input.trim())
-          documentationContext = {
-            scrapedData: scrapeData,
-            analysis: analysisResult,
-            urls: urls,
-            summary: analysisResult // This will be used for component generation
-          }
-          console.log('🤖 Documentation analyzed for context')
-        } else {
-          console.warn('⚠️ Documentation scraping failed, proceeding without context')
-        }
-      } catch (docError) {
-        console.warn('⚠️ Documentation analysis failed:', docError)
-      }
-    }
     
     // Add a generating status message with URL detection info
     const statusMessage: Message = {
       id: (Date.now() + 1).toString(),
       role: "assistant",
       content: urls.length > 0 
-        ? `🌐 Detected ${urls.length} URL(s) - Analyzing API documentation...\n📚 Scraping: ${urls.join(', ')}\n${documentationContext ? '✅ Documentation analyzed successfully' : '⚠️ Using basic analysis'}\n🎨 Generating your component with ${documentationContext ? 'API integration context' : 'standard features'}...`
+        ? `🌐 Detected ${urls.length} URL(s) - Analyzing API documentation...\n📚 Scraping: ${urls.join(', ')}\n🎨 Generating your component with API integration...`
         : "🎨 Generating your component...",
       timestamp: new Date(),
     }
     setMessages((prev) => [...prev, statusMessage])
 
     try {
-      // Step 2: Generate component with documentation context
-      const componentPrompt = documentationContext ? 
-        `${input}\n\nDOCUMENTATION CONTEXT FOR INTEGRATION:\n${JSON.stringify(documentationContext.summary, null, 2)}\n\nUse this context to create relevant API integrations, proper authentication, and realistic data handling in the component.` : 
-        input
-
+      // Generate component - the chat API handles URL processing internally
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          messages: [...messages, { ...newMessage, content: componentPrompt }],
+          messages: [...messages, newMessage],
         }),
       })
 
@@ -831,43 +792,14 @@ export default ${componentName}
       // Set the generated code directly to preview
       setGeneratedCode(cleanCode)
 
-      // Step 3: Generate contextual instructions based on documentation context
-      await generateInstructions(cleanCode, input.trim(), documentationContext)
+      // Step 3: Generate contextual instructions
+      await generateInstructions(cleanCode, input.trim(), null)
 
       // Check if documentation was analyzed and add results to success message
       let successContent = "✅ Component generated successfully! Check the preview →"
-
-      if (documentationResults) {
-        // Filter out font files from the count
-        const realEndpoints =
-          documentationResults.apiEndpoints?.filter(
-            (endpoint: string) =>
-              !endpoint.match(/\.(woff2?|ttf|eot|css|js|png|jpg|jpeg|gif|svg|ico)(\?|$)/i) &&
-              !endpoint.includes("font") &&
-              (endpoint.includes("/api/") ||
-                endpoint.includes("GET") ||
-                endpoint.includes("POST") ||
-                endpoint.includes("PUT") ||
-                endpoint.includes("DELETE") ||
-                endpoint.includes("/webhook")),
-          ) || []
-
-        successContent += `\n\n📚 **API Documentation Analyzed:**\n`
-        if (realEndpoints.length > 0) {
-          successContent += `• Found ${realEndpoints.length} real API endpoints\n`
-        } else {
-          successContent += `• Documentation analyzed (general API info)\n`
-        }
-
-        if (documentationResults.authMethod) {
-          successContent += `• Authentication: ${documentationResults.authMethod}\n`
-        }
-        if (documentationResults.rateLimit) {
-          successContent += `• Rate Limits: ${documentationResults.rateLimit}\n`
-        }
-        if (documentationResults.baseUrl) {
-          successContent += `• Base URL: ${documentationResults.baseUrl}\n`
-        }
+      
+      if (urls.length > 0) {
+        successContent += `\n\n📚 **API Documentation Analyzed:**\n• Processed ${urls.length} documentation URL(s)\n• Enhanced with API integration context`
       }
 
       // Update status message to success

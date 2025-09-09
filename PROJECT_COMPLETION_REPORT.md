@@ -172,7 +172,7 @@ Generate component with full integration...
 - ✅ **Next.js 14+**: App Router with enhanced routing
 - ✅ **React 18**: Latest features with concurrent rendering
 - ✅ **TypeScript**: Full type safety throughout
-- ✅ **Origin UI**: Complete design system (not shadcn as required)
+- ✅ **Origin UI**: Complete design system exclusively
 - ✅ **Tailwind CSS**: Utility-first styling
 
 **Backend:**

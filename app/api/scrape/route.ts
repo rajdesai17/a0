@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { scrapeUrl } from '@/lib/scrapeUtils'
+import { smartScrapeUrl } from '@/lib/scrapeUtils'
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'URL is required' }, { status: 400 })
     }
 
-    const result = await scrapeUrl(url)
+    const result = await smartScrapeUrl(url)
     return NextResponse.json(result)
 
   } catch (error) {
