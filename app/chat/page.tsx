@@ -7,7 +7,7 @@ import { Input } from "@/components/origin-ui/input"
 import { Card } from "@/components/origin-ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/origin-ui/tabs"
 import { ScrollArea } from "@/components/origin-ui/scroll-area"
-import { Send, Code, Eye, Sparkles, Download, FileText, Github, ArrowRight } from "lucide-react"
+import { Send, Code, Eye, Sparkles, Download, FileText } from "lucide-react"
 import CodeMirror from "@uiw/react-codemirror"
 import { javascript } from "@codemirror/lang-javascript"
 import { oneDark } from "@codemirror/theme-one-dark"
@@ -16,10 +16,6 @@ import { useTheme } from "next-themes"
 import { SandboxedPreview } from "@/components/sandboxed-preview"
 import Navbar from "@/components/navbar"
 import ReactMarkdown from "react-markdown"
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
-import { oneDark as syntaxOneDark, oneLight as syntaxOneLight } from "react-syntax-highlighter/dist/esm/styles/prism"
-import Link from "next/link"
-import ThemeToggle from "@/components/theme-toggle"
 
 interface Message {
   id: string
@@ -76,7 +72,7 @@ window.default = WelcomeComponent;`)
         title: result.title,
         content: result.content?.substring(0, 2000), // Limit content for analysis
         endpoints: result.apiEndpoints || [],
-        analysis: result.analysis
+        analysis: result.analysis,
       }))
 
       const analysisPrompt = `You are an API integration specialist. Create a concise, focused integration guide.
@@ -107,13 +103,13 @@ Required headers/auth method
 
 Focus only on what's needed for this specific use case. Be concise and practical.`
 
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          messages: [{ role: 'user', content: analysisPrompt }],
-          analysis: true // Flag to indicate this is for analysis
-        })
+          messages: [{ role: "user", content: analysisPrompt }],
+          analysis: true, // Flag to indicate this is for analysis
+        }),
       })
 
       if (response.ok) {
@@ -121,7 +117,7 @@ Focus only on what's needed for this specific use case. Be concise and practical
         return analysisData
       }
     } catch (error) {
-      console.error('Failed to analyze documentation:', error)
+      console.error("Failed to analyze documentation:", error)
     }
     return null
   }
@@ -183,7 +179,7 @@ Focus only on what's needed for this specific use case. Be concise and practical
     }
 
     let instructions = `# ${componentName} Component\n\n`
-    
+
     // Add usage instructions first
     instructions += `## 🚀 How to Use This Generated Component\n\n`
     instructions += `### Quick Start (3 Steps)\n`
@@ -195,61 +191,63 @@ Focus only on what's needed for this specific use case. Be concise and practical
     instructions += `- ✅ React 18+ project (Next.js, Vite, Create React App)\n`
     instructions += `- ✅ Tailwind CSS configured\n`
     instructions += `- ✅ Origin UI components\n\n`
-    
+
     // Check for documentation results and perform AI-powered contextual analysis
     let docInfo = ""
     let contextualAnalysis = null
-    let apiEndpointsDetails: Array<{domain: string, endpoints: string[], analysis: any}> = []
-    
+    const apiEndpointsDetails: Array<{ domain: string; endpoints: string[]; analysis: any }> = []
+
     // Use provided documentation context if available, otherwise fetch fresh
     if (docContext && docContext.scrapedData) {
       // Use provided documentation context
       contextualAnalysis = docContext.analysis
-      console.log('📚 Using provided documentation context for instructions')
-      
+      console.log("📚 Using provided documentation context for instructions")
+
       const results = docContext.scrapedData.results?.filter((r: any) => r.success) || []
-      
+
       if (results.length > 0) {
         docInfo = `\n## 📚 API Documentation Analysis\n\n`
         docInfo += `**URLs Analyzed:** ${results.length} documentation sources\n\n`
-        
+
         results.forEach((result: any, index: number) => {
           const domain = new URL(result.url).hostname
           docInfo += `### ${index + 1}. ${result.title || domain}\n`
           docInfo += `**URL:** [${result.url}](${result.url})\n`
           docInfo += `**Content:** ${result.wordCount || 0} words of documentation analyzed\n`
-          
+
           if (result.apiEndpoints && result.apiEndpoints.length > 0) {
             // Enhanced endpoint filtering for API documentation
             const realEndpoints = result.apiEndpoints.filter((endpoint: string) => {
               // Skip obvious static assets
               if (endpoint.match(/\.(woff2?|ttf|eot|css|js|png|jpg|jpeg|gif|svg|ico)(\?|$)/i)) return false
-              if (endpoint.includes('font') || endpoint.includes('static')) return false
-              
+              if (endpoint.includes("font") || endpoint.includes("static")) return false
+
               // Accept endpoints that look like API routes
               const lowerEndpoint = endpoint.toLowerCase()
               return (
                 // Common API patterns
-                lowerEndpoint.includes('/api/') ||
-                lowerEndpoint.includes('/webhook') ||
-                lowerEndpoint.includes('endpoint') ||
-                lowerEndpoint.startsWith('http') ||
+                lowerEndpoint.includes("/api/") ||
+                lowerEndpoint.includes("/webhook") ||
+                lowerEndpoint.includes("endpoint") ||
+                lowerEndpoint.startsWith("http") ||
                 // HTTP method patterns (like "post /checkouts", "get /payments")
                 lowerEndpoint.match(/^(get|post|put|delete|patch)\s+\//) ||
                 // Path patterns that look like API endpoints
                 lowerEndpoint.match(/^\/[a-z-_]+/) ||
                 // Any path with parameters
-                lowerEndpoint.includes('{') || lowerEndpoint.includes(':id') || lowerEndpoint.includes('/:')
+                lowerEndpoint.includes("{") ||
+                lowerEndpoint.includes(":id") ||
+                lowerEndpoint.includes("/:")
               )
             })
-            
+
             if (realEndpoints.length > 0) {
               docInfo += `**API Endpoints Found:** ${realEndpoints.length} real endpoints\n`
-              docInfo += `\`\`\`\n${realEndpoints.slice(0, 8).join('\n')}\n\`\`\`\n`
+              docInfo += `\`\`\`\n${realEndpoints.slice(0, 8).join("\n")}\n\`\`\`\n`
               apiEndpointsDetails.push({
                 domain: domain,
                 endpoints: realEndpoints,
-                analysis: result.analysis
+                analysis: result.analysis,
               })
             } else {
               docInfo += `**Documentation Type:** General API documentation without specific endpoint URLs\n`
@@ -263,89 +261,92 @@ Focus only on what's needed for this specific use case. Be concise and practical
     } else {
       // Fallback to existing documentation fetch logic (for backward compatibility)
       try {
-        const docResponse = await fetch('/api/documentation')
+        const docResponse = await fetch("/api/documentation")
         const docData = await docResponse.json()
         if (docData.hasDocumentation && docData.results) {
           setDocumentationResults(docData.results)
-          
+
           // Get the user's original request to provide contextual analysis
-          const requestToAnalyze = userRequest || currentUserRequest || (messages.length > 0 ? messages[messages.length - 1]?.content || '' : '')
-          
+          const requestToAnalyze =
+            userRequest ||
+            currentUserRequest ||
+            (messages.length > 0 ? messages[messages.length - 1]?.content || "" : "")
+
           // Use AI to analyze documentation in context of user's request
           if (requestToAnalyze && hasFetch) {
             contextualAnalysis = await analyzeDocumentationContext(docData.results, requestToAnalyze)
           }
-        
-        const results = docData.results.results?.filter((r: any) => r.success) || []
 
-        if (results.length > 0) {
-          docInfo = `\n## 📚 API Documentation Analysis\n\n`
-          docInfo += `**URLs Analyzed:** ${results.length} documentation sources\n\n`
+          const results = docData.results.results?.filter((r: any) => r.success) || []
 
-          results.forEach((result: any, index: number) => {
-            const domain = new URL(result.url).hostname
-            docInfo += `### ${index + 1}. ${result.title || domain}\n`
-            docInfo += `**URL:** [${result.url}](${result.url})\n`
-            docInfo += `**Content:** ${result.wordCount || 0} words of documentation analyzed\n`
+          if (results.length > 0) {
+            docInfo = `\n## 📚 API Documentation Analysis\n\n`
+            docInfo += `**URLs Analyzed:** ${results.length} documentation sources\n\n`
 
-            if (result.apiEndpoints && result.apiEndpoints.length > 0) {
-              // Enhanced endpoint filtering for API documentation
-              const realEndpoints = result.apiEndpoints.filter((endpoint: string) => {
-                // Skip obvious static assets
-                if (endpoint.match(/\.(woff2?|ttf|eot|css|js|png|jpg|jpeg|gif|svg|ico)(\?|$)/i)) return false
-                if (endpoint.includes("font") || endpoint.includes("static")) return false
+            results.forEach((result: any, index: number) => {
+              const domain = new URL(result.url).hostname
+              docInfo += `### ${index + 1}. ${result.title || domain}\n`
+              docInfo += `**URL:** [${result.url}](${result.url})\n`
+              docInfo += `**Content:** ${result.wordCount || 0} words of documentation analyzed\n`
 
-                // Accept endpoints that look like API routes
-                const lowerEndpoint = endpoint.toLowerCase()
-                return (
-                  // Common API patterns
-                  lowerEndpoint.includes("/api/") ||
-                  lowerEndpoint.includes("/webhook") ||
-                  lowerEndpoint.includes("endpoint") ||
-                  lowerEndpoint.startsWith("http") ||
-                  // HTTP method patterns (like "post /checkouts", "get /payments")
-                  lowerEndpoint.match(/^(get|post|put|delete|patch)\s+\//) ||
-                  // Path patterns that look like API endpoints
-                  lowerEndpoint.match(/^\/[a-z-_]+/) ||
-                  // Any path with parameters
-                  lowerEndpoint.includes("{") ||
-                  lowerEndpoint.includes(":id") ||
-                  lowerEndpoint.includes("/:")
-                )
-              })
+              if (result.apiEndpoints && result.apiEndpoints.length > 0) {
+                // Enhanced endpoint filtering for API documentation
+                const realEndpoints = result.apiEndpoints.filter((endpoint: string) => {
+                  // Skip obvious static assets
+                  if (endpoint.match(/\.(woff2?|ttf|eot|css|js|png|jpg|jpeg|gif|svg|ico)(\?|$)/i)) return false
+                  if (endpoint.includes("font") || endpoint.includes("static")) return false
 
-              if (realEndpoints.length > 0) {
-                docInfo += `**API Endpoints Found:** ${realEndpoints.length} real endpoints\n`
-                docInfo += `\`\`\`\n${realEndpoints.slice(0, 8).join("\n")}\n\`\`\`\n`
-                apiEndpointsDetails.push({
-                  domain: domain,
-                  endpoints: realEndpoints,
-                  analysis: result.analysis,
+                  // Accept endpoints that look like API routes
+                  const lowerEndpoint = endpoint.toLowerCase()
+                  return (
+                    // Common API patterns
+                    lowerEndpoint.includes("/api/") ||
+                    lowerEndpoint.includes("/webhook") ||
+                    lowerEndpoint.includes("endpoint") ||
+                    lowerEndpoint.startsWith("http") ||
+                    // HTTP method patterns (like "post /checkouts", "get /payments")
+                    lowerEndpoint.match(/^(get|post|put|delete|patch)\s+\//) ||
+                    // Path patterns that look like API endpoints
+                    lowerEndpoint.match(/^\/[a-z-_]+/) ||
+                    // Any path with parameters
+                    lowerEndpoint.includes("{") ||
+                    lowerEndpoint.includes(":id") ||
+                    lowerEndpoint.includes("/:")
+                  )
                 })
-              } else {
-                docInfo += `**Documentation Type:** General API documentation without specific endpoint URLs\n`
-              }
-            } else {
-              docInfo += `**Documentation Type:** Conceptual API documentation\n`
-            }
 
-            if (result.analysis) {
-              if (result.analysis.authMethods && result.analysis.authMethods.length > 0) {
-                docInfo += `**🔐 Authentication:** ${result.analysis.authMethods.join(", ")}\n`
+                if (realEndpoints.length > 0) {
+                  docInfo += `**API Endpoints Found:** ${realEndpoints.length} real endpoints\n`
+                  docInfo += `\`\`\`\n${realEndpoints.slice(0, 8).join("\n")}\n\`\`\`\n`
+                  apiEndpointsDetails.push({
+                    domain: domain,
+                    endpoints: realEndpoints,
+                    analysis: result.analysis,
+                  })
+                } else {
+                  docInfo += `**Documentation Type:** General API documentation without specific endpoint URLs\n`
+                }
+              } else {
+                docInfo += `**Documentation Type:** Conceptual API documentation\n`
               }
-              if (result.analysis.commonPatterns && result.analysis.commonPatterns.length > 0) {
-                docInfo += `**📋 Integration Patterns:** ${result.analysis.commonPatterns.join(", ")}\n`
+
+              if (result.analysis) {
+                if (result.analysis.authMethods && result.analysis.authMethods.length > 0) {
+                  docInfo += `**🔐 Authentication:** ${result.analysis.authMethods.join(", ")}\n`
+                }
+                if (result.analysis.commonPatterns && result.analysis.commonPatterns.length > 0) {
+                  docInfo += `**📋 Integration Patterns:** ${result.analysis.commonPatterns.join(", ")}\n`
+                }
+                if (result.analysis.integrationNotes) {
+                  docInfo += `**💡 Integration Notes:** ${result.analysis.integrationNotes}\n`
+                }
               }
-              if (result.analysis.integrationNotes) {
-                docInfo += `**💡 Integration Notes:** ${result.analysis.integrationNotes}\n`
-              }
-            }
-            docInfo += `\n`
-          })
-        }
+              docInfo += `\n`
+            })
+          }
         }
       } catch (error) {
-        console.error('Failed to fetch documentation:', error)
+        console.error("Failed to fetch documentation:", error)
       }
     }
 
@@ -413,10 +414,14 @@ Focus only on what's needed for this specific use case. Be concise and practical
       instructions += `\`\`\`jsx\n// Basic usage without props\n<${componentName} />\n\n`
       if (componentProps.length > 0) {
         instructions += `// Advanced usage with props\n<${componentName}\n`
-        componentProps.slice(0, 3).forEach(prop => {
-          const sampleValue = prop.type.includes('string') ? `"sample value"` : 
-                             prop.type.includes('number') ? `{123}` :
-                             prop.type.includes('boolean') ? `{true}` : `{{}}`
+        componentProps.slice(0, 3).forEach((prop) => {
+          const sampleValue = prop.type.includes("string")
+            ? `"sample value"`
+            : prop.type.includes("number")
+              ? `{123}`
+              : prop.type.includes("boolean")
+                ? `{true}`
+                : `{{}}`
           instructions += `  ${prop.name}=${sampleValue}\n`
         })
         instructions += `/>\n`
@@ -426,7 +431,7 @@ Focus only on what's needed for this specific use case. Be concise and practical
 
     instructions += `## Basic Usage\n\`\`\`jsx\nimport ${componentName} from './${componentName}'\n\nfunction App() {\n  return (\n    <div className="p-4">\n      <${componentName}${componentProps.length > 0 ? " />" : " />"}\n    </div>\n  )\n}\n\`\`\`\n\n`
 
-    instructions += `\n## 🛠️ Installation & Setup\n`
+    instructions += `## 🛠️ Installation & Setup\n`
     instructions += `### Step 1: Component Installation\n`
     instructions += `1. Copy the component code to your project (recommended: \`components/${componentName}.tsx\`)\n`
     instructions += `2. Ensure you have the required dependencies installed\n\n`
@@ -442,7 +447,7 @@ Focus only on what's needed for this specific use case. Be concise and practical
       instructions += `### Step 4: API Integration Setup\n`
       instructions += `For components with API integration, additional setup is required:\n\n`
       instructions += `**Environment Variables (\`.env.local\`):**\n`
-      instructions += `\`\`\`bash\n# Add your API credentials\nNEXT_PUBLIC_API_KEY=your_api_key_here\nAPI_SECRET=your_secret_key\nAPI_BASE_URL=https://api.example.com\n\`\`\`\n\n`
+      instructions += `\`\`\`bash\n# Add your API credentials\n# Example format:\n# NEXT_PUBLIC_API_KEY=your_key_here\n# API_BASE_URL=https://api.example.com\n\`\`\`\n\n`
       instructions += `**CORS Configuration:**\n`
       instructions += `If calling external APIs from the browser, ensure CORS is properly configured on the API server.\n\n`
     } else {
@@ -532,9 +537,9 @@ Focus only on what's needed for this specific use case. Be concise and practical
 
       instructions += `### 🔧 Development vs Production Configuration\n\n`
       instructions += `**Development Environment:**\n`
-      instructions += `\`\`\`javascript\n// .env.local (for development)\nNEXT_PUBLIC_API_BASE_URL=https://dev-api.${apiEndpointsDetails[0]?.domain || "example.com"}\nNEXT_PUBLIC_API_KEY=dev_key_here\n\n// In your component\nconst API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL\nconst API_KEY = process.env.NEXT_PUBLIC_API_KEY\n\`\`\`\n\n`
+      instructions += `\`\`\`javascript\n// .env.local (for development)\nNEXT_PUBLIC_API_BASE_URL=https://dev-api.${apiEndpointsDetails[0]?.domain || "example.com"}\nNEXT_PUBLIC_API_KEY=<dev_key>\n\n// In your component\nconst API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL\nconst API_KEY = process.env.NEXT_PUBLIC_API_KEY\n\`\`\`\n\n`
       instructions += `**Production Environment:**\n`
-      instructions += `\`\`\`javascript\n// .env.production (for production)\nNEXT_PUBLIC_API_BASE_URL=https://api.${apiEndpointsDetails[0]?.domain || "example.com"}\nNEXT_PUBLIC_API_KEY=prod_key_here\n\n// Same component code works in both environments!\n\`\`\`\n\n`
+      instructions += `\`\`\`javascript\n// .env.production (for production)\nNEXT_PUBLIC_API_BASE_URL=https://api.${apiEndpointsDetails[0]?.domain || "example.com"}\nNEXT_PUBLIC_API_KEY=<prod_key>\n\n// Same component code works in both environments!\n\`\`\`\n\n`
     } else if (hasFetch && !contextualAnalysis) {
       instructions += `## 🔗 API Integration Guide\n\n`
       instructions += `This component includes API integration capabilities. Here's what you need to know:\n\n`
@@ -548,7 +553,7 @@ Focus only on what's needed for this specific use case. Be concise and practical
       instructions += `\`\`\`javascript\n// Complete API integration example\nconst [data, setData] = useState(null)\nconst [loading, setLoading] = useState(false)\nconst [error, setError] = useState(null)\n\nconst fetchData = async () => {\n  setLoading(true)\n  setError(null)\n  \n  try {\n    const response = await fetch('/api/your-endpoint', {\n      method: 'GET',\n      headers: {\n        'Content-Type': 'application/json',\n        'Authorization': 'Bearer ' + process.env.NEXT_PUBLIC_API_KEY\n      }\n    })\n    \n    if (!response.ok) {\n      throw new Error(\`HTTP error! status: \${response.status}\`)\n    }\n    \n    const result = await response.json()\n    setData(result)\n  } catch (error) {\n    console.error('Fetch error:', error)\n    setError(error.message)\n  } finally {\n    setLoading(false)\n  }\n}\n\n// Use in component\nuseEffect(() => {\n  fetchData()\n}, [])\n\`\`\`\n\n`
 
       instructions += `### Environment Variables Setup\n`
-      instructions += `\`\`\`bash\n# .env.local\nNEXT_PUBLIC_API_URL=https://api.example.com\nNEXT_PUBLIC_API_KEY=your_api_key_here\n\`\`\`\n\n`
+      instructions += `\`\`\`bash\n# .env.local\nNEXT_PUBLIC_API_URL=https://api.example.com\nNEXT_PUBLIC_API_KEY=<your_api_key>\n\`\`\`\n\n`
     }
 
     instructions += `## 🎯 Customization Guide\n\n`
@@ -731,14 +736,15 @@ export default ${componentName}
     // Check for URLs in the message for status display
     const urlRegex = /(https?:\/\/[^\s]+)/gi
     const urls = input.match(urlRegex) || []
-    
+
     // Add a generating status message with URL detection info
     const statusMessage: Message = {
       id: (Date.now() + 1).toString(),
       role: "assistant",
-      content: urls.length > 0 
-        ? `🌐 Detected ${urls.length} URL(s) - Analyzing API documentation...\n📚 Scraping: ${urls.join(', ')}\n🎨 Generating your component with API integration...`
-        : "🎨 Generating your component...",
+      content:
+        urls.length > 0
+          ? `🌐 Detected ${urls.length} URL(s) - Analyzing API documentation...\n📚 Scraping: ${urls.join(", ")}\n🎨 Generating your component with API integration...`
+          : "🎨 Generating your component...",
       timestamp: new Date(),
     }
     setMessages((prev) => [...prev, statusMessage])
@@ -797,7 +803,7 @@ export default ${componentName}
 
       // Check if documentation was analyzed and add results to success message
       let successContent = "✅ Component generated successfully! Check the preview →"
-      
+
       if (urls.length > 0) {
         successContent += `\n\n📚 **API Documentation Analyzed:**\n• Processed ${urls.length} documentation URL(s)\n• Enhanced with API integration context`
       }
@@ -853,225 +859,208 @@ export default ${componentName}
             </div>
           </div>
 
-        {/* Messages */}
-        <ScrollArea className="flex-1 p-6">
-          <div className="space-y-6">
-            {messages.map((message) => (
-              <div key={message.id} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
-                <div
-                  className={`max-w-[85%] rounded-2xl p-4 shadow-sm ${
-                    message.role === "user" 
-                      ? "bg-primary text-primary-foreground rounded-br-md" 
-                      : "bg-muted/50 text-muted-foreground rounded-bl-md"
-                  }`}
-                >
-                  {message.role === "assistant" && message.content.includes("📚 **API Documentation Analyzed:**") ? (
-                    <div className="text-sm leading-relaxed">
-                      <ReactMarkdown
-                        components={{
-                          p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
-                          strong: ({ children }) => (
-                            <strong className="font-semibold text-foreground">{children}</strong>
-                          ),
-                          ul: ({ children }) => <ul className="ml-4 space-y-1">{children}</ul>,
-                          li: ({ children }) => <li className="text-sm">{children}</li>,
-                        }}
-                      >
-                        {message.content}
-                      </ReactMarkdown>
-                    </div>
-                  ) : (
-                    <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
-                  )}
-                  <p className="text-xs opacity-70 mt-1">{message.timestamp.toLocaleTimeString()}</p>
-                </div>
-              </div>
-            ))}
-            {isLoading && (
-              <div className="flex justify-start">
-                <div className="bg-muted text-muted-foreground rounded-lg p-3">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-current rounded-full animate-pulse"></div>
-                    <div className="w-2 h-2 bg-current rounded-full animate-pulse delay-100"></div>
-                    <div className="w-2 h-2 bg-current rounded-full animate-pulse delay-200"></div>
+          {/* Messages */}
+          <ScrollArea className="flex-1 p-6">
+            <div className="space-y-6">
+              {messages.map((message) => (
+                <div key={message.id} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
+                  <div
+                    className={`max-w-[85%] rounded-2xl p-4 shadow-sm ${
+                      message.role === "user"
+                        ? "bg-primary text-primary-foreground rounded-br-md"
+                        : "bg-muted/50 text-muted-foreground rounded-bl-md"
+                    }`}
+                  >
+                    {message.role === "assistant" && message.content.includes("📚 **API Documentation Analyzed:**") ? (
+                      <div className="text-sm leading-relaxed">
+                        <ReactMarkdown
+                          components={{
+                            p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                            strong: ({ children }) => (
+                              <strong className="font-semibold text-foreground">{children}</strong>
+                            ),
+                            ul: ({ children }) => <ul className="ml-4 space-y-1">{children}</ul>,
+                            li: ({ children }) => <li className="text-sm">{children}</li>,
+                          }}
+                        >
+                          {message.content}
+                        </ReactMarkdown>
+                      </div>
+                    ) : (
+                      <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+                    )}
+                    <p className="text-xs opacity-70 mt-1">{message.timestamp.toLocaleTimeString()}</p>
                   </div>
                 </div>
-              </div>
-            )}
-          </div>
-        </ScrollArea>
-
-        {/* Error Display */}
-        {error && (
-          <div className="p-4 bg-destructive/10 border-t border-destructive/20">
-            <p className="text-sm text-destructive">Error: {error}</p>
-          </div>
-        )}
-
-        {/* Input */}
-        <div className="p-6 border-t border-border">
-          <form onSubmit={handleSubmit} className="flex gap-3">
-            <Input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask a0 to build a component..."
-              className="flex-1 rounded-xl border-border/50 bg-background/50 px-4 py-3 focus:ring-2 focus:ring-primary/20"
-              disabled={isLoading}
-            />
-            <Button
-              type="submit"
-              disabled={isLoading || !input?.trim()}
-              title={!input?.trim() ? "Type a message first" : "Send message"}
-              className="rounded-xl px-6 py-3 shadow-sm"
-            >
-              <Send className="w-4 h-4" />
-            </Button>
-          </form>
-        </div>
-      </div>
-
-      {/* Right Panel - Preview */}
-      <div className="w-1/2 flex flex-col bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
-        {/* Preview Header */}
-        <div className="p-6 border-b border-border bg-card">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="font-semibold text-lg text-foreground">Component Preview</h2>
-              <p className="text-sm text-muted-foreground">Preview | Code | Docs</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Tabs */}
-        <Tabs value={selectedTab} onValueChange={setSelectedTab} className="flex-1 flex flex-col overflow-hidden">
-          <div className="px-6 pt-4 pb-0 flex-shrink-0">
-            <TabsList className="grid w-full grid-cols-3 rounded-xl">
-              <TabsTrigger value="preview" className="flex items-center gap-2 rounded-lg">
-                <Eye className="w-4 h-4" />
-                Preview
-              </TabsTrigger>
-              <TabsTrigger value="code" className="flex items-center gap-2 rounded-lg">
-                <Code className="w-4 h-4" />
-                Code
-              </TabsTrigger>
-              <TabsTrigger value="instructions" className="flex items-center gap-2 rounded-lg">
-                <FileText className="w-4 h-4" />
-                Instructions
-              </TabsTrigger>
-            </TabsList>
-          </div>
-
-          <TabsContent value="preview" className="flex-1 p-3 overflow-hidden min-h-0">
-            <div className="h-full w-full min-h-0">
-              <SandboxedPreview code={generatedCode} />
-            </div>
-          </TabsContent>
-
-          <TabsContent value="code" className="flex-1 p-6 pt-4 flex flex-col overflow-hidden">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-medium text-muted-foreground">Component Code</h3>
-              <div className="flex items-center gap-2">
-                {downloadSuccess && <span className="text-sm text-green-600 dark:text-green-400">Downloaded!</span>}
-                <Button
-                  onClick={downloadComponent}
-                  size="sm"
-                  variant="outline"
-                  className="flex items-center gap-2 bg-transparent rounded-lg"
-                >
-                  <Download className="w-4 h-4" />
-                  Download
-                </Button>
-              </div>
-            </div>
-            <Card className="flex-1 overflow-hidden rounded-xl border-border/50 shadow-sm">
-              {/* File Header */}
-              <div className="flex items-center px-4 py-2 bg-muted/30 border-b border-border">
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="font-mono">{extractComponentName(generatedCode)}.tsx</span>
+              ))}
+              {isLoading && (
+                <div className="flex justify-start">
+                  <div className="bg-muted text-muted-foreground rounded-lg p-3">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-current rounded-full animate-pulse"></div>
+                      <div className="w-2 h-2 bg-current rounded-full animate-pulse delay-100"></div>
+                      <div className="w-2 h-2 bg-current rounded-full animate-pulse delay-200"></div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div className="h-full overflow-y-auto scrollbar-hide">
-                <CodeMirror
-                  value={generatedCode}
-                  onChange={(value) => setGeneratedCode(value)}
-                  extensions={[javascript({ jsx: true }), EditorView.lineWrapping]}
-                  theme={theme === "dark" ? oneDark : undefined}
-                  className="h-full"
-                />
-              </div>
-            </Card>
-          </TabsContent>
+              )}
+            </div>
+          </ScrollArea>
 
-          <TabsContent value="instructions" className="flex-1 p-6 pt-4 overflow-hidden">
-            <Card className="h-full overflow-hidden rounded-xl border-border/50 shadow-sm">
-              <div className="h-full overflow-y-auto scrollbar-hide p-6">
-                <div className="prose prose-sm max-w-none text-foreground leading-relaxed">
-                  <ReactMarkdown
-                    components={{
-                      h1: ({ children }) => (
-                        <h1 className="text-2xl font-bold text-foreground mb-4 mt-0 border-b border-border pb-2">
-                          {children}
-                        </h1>
-                      ),
-                      h2: ({ children }) => (
-                        <h2 className="text-xl font-semibold text-foreground mb-3 mt-6 first:mt-0">{children}</h2>
-                      ),
-                      p: ({ children }) => <p className="text-foreground mb-4 leading-relaxed">{children}</p>,
-                      ul: ({ children }) => <ul className="list-none space-y-2 mb-4 pl-0">{children}</ul>,
-                      li: ({ children }) => (
-                        <li className="flex items-start gap-2 text-foreground">
-                          <span className="text-primary mt-1 text-sm">•</span>
-                          <span className="flex-1">{children}</span>
-                        </li>
-                      ),
-                      strong: ({ children }) => <strong className="font-semibold text-foreground">{children}</strong>,
-                      code: ({ children, className }) => {
-                        const isInline = !className
-                        return isInline ? (
-                          <code className="bg-muted text-foreground px-1.5 py-0.5 rounded text-sm font-mono border">
-                            {children}
-                          </code>
-                        ) : (
-                          <code className={className}>{children}</code>
-                        )
-                      },
-                      pre: ({ children, ...props }) => {
-                        const child = children as any
-                        const className = child?.props?.className || ""
-                        const match = /language-(\w+)/.exec(className)
-                        const language = match ? match[1] : "javascript"
+          {/* Error Display */}
+          {error && (
+            <div className="p-4 bg-destructive/10 border-t border-destructive/20">
+              <p className="text-sm text-destructive">Error: {error}</p>
+            </div>
+          )}
 
-                        return (
-                          <div className="mb-4 mt-2">
-                            <SyntaxHighlighter
-                              style={theme === "dark" ? syntaxOneDark : syntaxOneLight}
-                              language={language}
-                              customStyle={{
-                                margin: 0,
-                                borderRadius: "0.5rem",
-                                backgroundColor: theme === "dark" ? "hsl(var(--muted))" : "hsl(var(--muted))",
-                                border: "1px solid hsl(var(--border))",
-                                fontSize: "0.875rem",
-                                lineHeight: "1.5",
-                              }}
-                              {...props}
-                            >
-                              {String(child?.props?.children || "").replace(/\n$/, "")}
-                            </SyntaxHighlighter>
-                          </div>
-                        )
-                      },
-                    }}
+          {/* Input */}
+          <div className="p-6 border-t border-border">
+            <form onSubmit={handleSubmit} className="flex gap-3">
+              <Input
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Ask a0 to build a component..."
+                className="flex-1 rounded-xl border-border/50 bg-background/50 px-4 py-3 focus:ring-2 focus:ring-primary/20"
+                disabled={isLoading}
+              />
+              <Button
+                type="submit"
+                disabled={isLoading || !input?.trim()}
+                title={!input?.trim() ? "Type a message first" : "Send message"}
+                className="rounded-xl px-6 py-3 shadow-sm"
+              >
+                <Send className="w-4 h-4" />
+              </Button>
+            </form>
+          </div>
+        </div>
+
+        {/* Right Panel - Preview */}
+        <div className="w-1/2 flex flex-col bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
+          {/* Preview Header */}
+          <div className="p-6 border-b border-border bg-card">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="font-semibold text-lg text-foreground">Component Preview</h2>
+                <p className="text-sm text-muted-foreground">Preview | Code | Docs</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Tabs */}
+          <Tabs value={selectedTab} onValueChange={setSelectedTab} className="flex-1 flex flex-col overflow-hidden">
+            <div className="px-6 pt-4 pb-0 flex-shrink-0">
+              <TabsList className="grid w-full grid-cols-3 rounded-xl">
+                <TabsTrigger value="preview" className="flex items-center gap-2 rounded-lg">
+                  <Eye className="w-4 h-4" />
+                  Preview
+                </TabsTrigger>
+                <TabsTrigger value="code" className="flex items-center gap-2 rounded-lg">
+                  <Code className="w-4 h-4" />
+                  Code
+                </TabsTrigger>
+                <TabsTrigger value="instructions" className="flex items-center gap-2 rounded-lg">
+                  <FileText className="w-4 h-4" />
+                  Instructions
+                </TabsTrigger>
+              </TabsList>
+            </div>
+
+            <TabsContent value="preview" className="flex-1 p-3 overflow-hidden min-h-0">
+              <div className="h-full w-full min-h-0">
+                <SandboxedPreview code={generatedCode} />
+              </div>
+            </TabsContent>
+
+            <TabsContent value="code" className="flex-1 p-6 pt-4 flex flex-col overflow-hidden">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-medium text-muted-foreground">Component Code</h3>
+                <div className="flex items-center gap-2">
+                  {downloadSuccess && <span className="text-sm text-green-600 dark:text-green-400">Downloaded!</span>}
+                  <Button
+                    onClick={downloadComponent}
+                    size="sm"
+                    variant="outline"
+                    className="flex items-center gap-2 bg-transparent rounded-lg"
                   >
-                    {instructions}
-                  </ReactMarkdown>
+                    <Download className="w-4 h-4" />
+                    Download
+                  </Button>
                 </div>
               </div>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </div>
+              <Card className="flex-1 overflow-hidden rounded-xl border-border/50 shadow-sm">
+                {/* File Header */}
+                <div className="flex items-center px-4 py-2 bg-muted/30 border-b border-border">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span className="font-mono">{extractComponentName(generatedCode)}.tsx</span>
+                  </div>
+                </div>
+                <div className="h-full overflow-y-auto scrollbar-hide">
+                  <CodeMirror
+                    value={generatedCode}
+                    onChange={(value) => setGeneratedCode(value)}
+                    extensions={[javascript({ jsx: true }), EditorView.lineWrapping]}
+                    theme={theme === "dark" ? oneDark : undefined}
+                    className="h-full"
+                  />
+                </div>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="instructions" className="flex-1 p-6 pt-4 overflow-hidden">
+              <Card className="h-full overflow-hidden rounded-xl border-border/50 shadow-sm">
+                <div className="h-full overflow-y-auto scrollbar-hide p-6">
+                  <div className="prose prose-sm max-w-none text-foreground leading-relaxed">
+                    <ReactMarkdown
+                      components={{
+                        h1: ({ children }) => (
+                          <h1 className="text-2xl font-bold text-foreground mb-4 mt-0 border-b border-border pb-2">
+                            {children}
+                          </h1>
+                        ),
+                        h2: ({ children }) => (
+                          <h2 className="text-xl font-semibold text-foreground mb-3 mt-6 first:mt-0">{children}</h2>
+                        ),
+                        p: ({ children }) => <p className="text-foreground mb-4 leading-relaxed">{children}</p>,
+                        ul: ({ children }) => <ul className="list-none space-y-2 mb-4 pl-0">{children}</ul>,
+                        li: ({ children }) => (
+                          <li className="flex items-start gap-2 text-foreground">
+                            <span className="text-primary mt-1 text-sm">•</span>
+                            <span className="flex-1">{children}</span>
+                          </li>
+                        ),
+                        strong: ({ children }) => <strong className="font-semibold text-foreground">{children}</strong>,
+                        code: ({ children, className }) => {
+                          const isInline = !className
+                          return isInline ? (
+                            <code className="bg-muted text-foreground px-1.5 py-0.5 rounded text-sm font-mono border">
+                              {children}
+                            </code>
+                          ) : (
+                            <code className={className}>{children}</code>
+                          )
+                        },
+                        pre: ({ children }) => {
+                          return (
+                            <div className="mb-4 mt-2">
+                              <pre className="bg-muted text-foreground p-4 rounded-lg border border-border overflow-x-auto text-sm font-mono leading-relaxed">
+                                {children}
+                              </pre>
+                            </div>
+                          )
+                        },
+                      }}
+                    >
+                      {instructions}
+                    </ReactMarkdown>
+                  </div>
+                </div>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </div>
       </div>
     </div>
   )
