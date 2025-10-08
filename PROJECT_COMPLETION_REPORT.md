@@ -16,13 +16,13 @@
 - Responsive design with mobile support
 
 **How we implemented:**
-```typescript
+\`\`\`typescript
 // app/chat/page.tsx - Main chat interface
 - Left panel: Chat messages with AI interaction
 - Right panel: Sandboxed component preview
 - Split-screen responsive layout using Tailwind CSS
 - Real-time updates with React state management
-```
+\`\`\`
 
 **Key Features:**
 - ✅ Live component preview
@@ -38,7 +38,7 @@
 - Comprehensive documentation analysis and endpoint extraction
 
 **How we implemented:**
-```typescript
+\`\`\`typescript
 // lib/scrapeUtils.ts - Core scraping functionality
 export async function scrapeUrl(url: string): Promise<string> {
   // Direct fetch with anti-bot headers
@@ -49,7 +49,7 @@ export async function scrapeUrl(url: string): Promise<string> {
 // app/api/chat/route.ts - Multi-URL processing
 const urls = extractUrls(userMessage);
 const documentationContext = await browseTool.execute({ urls });
-```
+\`\`\`
 
 **Key Features:**
 - ✅ **Multi-URL Support**: Can scrape 2+ documentation sources simultaneously
@@ -58,12 +58,12 @@ const documentationContext = await browseTool.execute({ urls });
 - ✅ **Context Integration**: Passes scraped content to AI for component generation
 
 **Verified Working Examples:**
-```
+\`\`\`
 ✅ billingsdk.com + dodopayments.com (2,823 characters context)
 ✅ billingsdk.com + docs.dodopayments.com/introduction (3,154 characters context)
 ✅ 20+ API endpoints extracted from Dodo Payments docs
 ✅ Component generation with full documentation context
-```
+\`\`\`
 
 ### **3. AI-Powered Component Generation (95% ✅)**
 
@@ -73,7 +73,7 @@ const documentationContext = await browseTool.execute({ urls });
 - Comprehensive instruction generation with troubleshooting guides
 
 **How we implemented:**
-```typescript
+\`\`\`typescript
 // app/api/chat/route.ts - AI Integration
 const stream = await streamText({
   model: google('gemini-2.5-flash'), // Upgraded from 2.0
@@ -81,7 +81,7 @@ const stream = await streamText({
   tools: { browseTool },
   system: `Enhanced system prompt with documentation context`
 });
-```
+\`\`\`
 
 **Key Features:**
 - ✅ **Google Gemini 2.5 Flash**: Latest stable model for reliability
@@ -97,13 +97,13 @@ const stream = await streamText({
 - Consistent branding across all pages
 
 **How we implemented:**
-```typescript
+\`\`\`typescript
 // app/landing/page.tsx - Landing page
 - Hero section with "a0" branding
 - Feature highlights and benefits
 - Call-to-action buttons
 - Responsive design with Origin UI components
-```
+\`\`\`
 
 **Key Features:**
 - ✅ **Professional Branding**: Complete "a0" identity system
@@ -131,40 +131,40 @@ const stream = await streamText({
 
 ### **Multi-API Integration Architecture:**
 
-```
+\`\`\`
 User Input → URL Detection → Parallel Scraping → Content Analysis → Context Integration → AI Generation → Component Output
-```
+\`\`\`
 
 **1. URL Detection & Parsing:**
-```typescript
+\`\`\`typescript
 // Extract URLs from user message
 const urlRegex = /(https?:\/\/[^\s]+)/gi;
 const urls = userMessage.match(urlRegex) || [];
-```
+\`\`\`
 
 **2. Parallel Documentation Scraping:**
-```typescript
+\`\`\`typescript
 // Scrape multiple URLs simultaneously
 const scrapePromises = urls.map(url => scrapeUrl(url));
 const results = await Promise.all(scrapePromises);
-```
+\`\`\`
 
 **3. Content Analysis & Endpoint Extraction:**
-```typescript
+\`\`\`typescript
 // Extract API endpoints and patterns
 const endpoints = content.match(/(?:GET|POST|PUT|DELETE)\s+\/[^\s]*/gi);
 const patterns = analyzeIntegrationPatterns(content);
-```
+\`\`\`
 
 **4. Context-Aware AI Generation:**
-```typescript
+\`\`\`typescript
 // Pass documentation context to AI
 const enhancedPrompt = `
 User Request: ${userMessage}
 Documentation Context: ${documentationContext}
 Generate component with full integration...
 `;
-```
+\`\`\`
 
 ### **Technical Stack Implementation:**
 
@@ -186,10 +186,10 @@ Generate component with full integration...
 ## 🎨 **UI/UX IMPROVEMENTS WE MADE**
 
 ### **1. Complete Branding System:**
-```
+\`\`\`
 ❌ Before: "AI Component Generator" 
 ✅ After: "a0 - AI Component Studio"
-```
+\`\`\`
 
 **Changes Made:**
 - Updated all page titles and metadata
@@ -198,7 +198,7 @@ Generate component with full integration...
 - Professional navbar with logo linking
 
 ### **2. Component Architecture:**
-```typescript
+\`\`\`typescript
 // Before: Duplicated navbar code
 // After: Reusable navbar component
 export function Navbar() {
@@ -210,7 +210,7 @@ export function Navbar() {
     </div>
   );
 }
-```
+\`\`\`
 
 ### **3. Enhanced User Experience:**
 - ✅ **Improved Instructions**: User-first guidance with installation steps
@@ -239,20 +239,20 @@ export function Navbar() {
 ### **Multi-API Integration Test Results:**
 
 **Test 1: Basic Multi-API**
-```
+\`\`\`
 ✅ Input: "create a pricing card integrated with http://billingsdk.com/ http://dodopayments.com/"
 ✅ Result: Successfully scraped both URLs (2,823 characters context)
 ✅ Component: Generated with billing and payment integration
 ✅ Time: 21.4 seconds
-```
+\`\`\`
 
 **Test 2: Documentation-Focused**
-```
+\`\`\`
 ✅ Input: "create a pricing card integrated with http://billingsdk.com/ https://docs.dodopayments.com/introduction"
 ✅ Result: Successfully scraped both URLs (3,154 characters context)
 ✅ API Analysis: Found 20 Dodo Payments API endpoints
 ✅ Time: 36.2 seconds
-```
+\`\`\`
 
 ---
 
@@ -303,7 +303,7 @@ export function Navbar() {
 
 ## 📁 **PROJECT STRUCTURE**
 
-```
+\`\`\`
 v0-split-screen-chaty/
 ├── app/
 │   ├── chat/page.tsx              # Main chat interface
@@ -322,7 +322,7 @@ v0-split-screen-chaty/
 │   └── tools/browseTool.ts        # Multi-API browser tool
 ├── .env.local                     # Environment configuration
 └── README.md                      # Project documentation
-```
+\`\`\`
 
 ## 🔧 **TECHNICAL ACHIEVEMENTS**
 

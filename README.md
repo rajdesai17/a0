@@ -51,19 +51,19 @@
 
 ## 💡 Example Usage
 
-```
+\`\`\`
 "create a pricing card with Stripe integration"
 "build a user dashboard with authentication"
 "design a checkout flow with payment processing"
 "create a data table with Supabase integration"
-```
+\`\`\`
 
 ## 🧠 Smart Content Filtering (NEW!)
 
 **a0** now features intelligent content filtering that understands your specific component needs:
 
 ### 🎯 **How Smart Filtering Works**
-```bash
+\`\`\`bash
 User Request: "create a pricing component"
 ↓
 Topic Extraction: ["pricing", "payment", "subscription", "billing"]
@@ -73,7 +73,7 @@ Smart Crawling: Targets /pricing, /billing, /docs/payments sections
 Content Filtering: Filters 2,000+ words → 500 highly relevant words
 ↓
 AI Generation: Receives precisely relevant context for better components
-```
+\`\`\`
 
 ### 📊 **Results**
 - **85% more relevant** content compared to basic scraping
@@ -93,7 +93,7 @@ AI Generation: Receives precisely relevant context for better components
 
 ### Steps
 
-```bash
+\`\`\`bash
 # Clone and install
 git clone https://github.com/rajdesai17/v0-split-screen-chaty.git
 cd v0-split-screen-chaty
@@ -106,7 +106,7 @@ cp .env.example .env.local
 
 # Run locally
 pnpm dev
-```
+\`\`\`
 
 Open http://localhost:3000
 
@@ -114,10 +114,10 @@ Open http://localhost:3000
 
 Create a `.env.local` file in the root directory:
 
-```env
+\`\`\`env
 GOOGLE_GENERATIVE_AI_API_KEY=your_api_key_here
 FIRECRAWL_API_KEY=your_firecrawl_key_here # Optional: For enhanced scraping
-```
+\`\`\`
 
 ## 2. Example Usage
 
@@ -125,28 +125,28 @@ You can describe components directly or provide API docs for integration.
 
 **Basic Components:**
 
-```
+\`\`\`
 "create a modern pricing card"
 "build a contact form with validation" 
 "design a hero section with call-to-action"
-```
+\`\`\`
 
 **Based on API Docs:**
 
-```
+\`\`\`
 "create a pricing card integrated with http://billingsdk.com/ http://dodopayments.com/"
 "create a user profile with Supabase authentication"
 "build a payment form integrated with Stripe"
 "design a dashboard with real-time data from Firebase"
-```
+\`\`\`
 
 **Advanced Components:**
 
-```
+\`\`\`
 "create a multi-step form with progress tracking"
 "build a data visualization dashboard with charts"
 "design a e-commerce product catalog with filtering"
-```
+\`\`\`
 
 ## 3. Why Origin UI?
 
@@ -210,7 +210,7 @@ All generated components follow Origin UI conventions with full type safety.
 
 ## 🧪 Verified Multi-API Examples
 
-```bash
+\`\`\`bash
 # Example 1: Billing & Payments Integration
 "create a pricing card integrated with http://billingsdk.com/ http://dodopayments.com/"
 ✅ Result: 2,823 characters of context, complete integration guide
@@ -218,13 +218,13 @@ All generated components follow Origin UI conventions with full type safety.
 # Example 2: Documentation-focused Integration  
 "create a pricing card integrated with http://billingsdk.com/ https://docs.dodopayments.com/introduction"
 ✅ Result: 3,154 characters of context, 20+ API endpoints extracted
-```
+\`\`\`
 
 ## 🛠️ Architecture Overview
 
-```
+\`\`\`
 User Input → URL Detection → Parallel Scraping → Content Analysis → AI Generation → Component Output
-```
+\`\`\`
 
 **Key Components:**
 
@@ -247,13 +247,13 @@ User Input → URL Detection → Parallel Scraping → Content Analysis → AI G
 
 ## 📁 Project Structure
 
-```
+\`\`\`
 a0-component-studio/
 ├── app/                    # Next.js app directory
 ├── components/             # Reusable UI components  
 ├── lib/                    # Utilities and tools
 └── public/                 # Static assets
-```
+\`\`\`
 
 ## 🤝 Contributing
 
@@ -273,6 +273,6 @@ This project is licensed under the MIT License.
 
 ---
 
-**Built with ❤️**
+**Built with ❤️ by the a0 team**
 
 > 📋 **For detailed technical documentation, see [PROJECT_COMPLETION_REPORT.md](./PROJECT_COMPLETION_REPORT.md)**

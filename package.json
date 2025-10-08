@@ -17,7 +17,7 @@
     "@codemirror/theme-one-dark": "latest",
     "@codemirror/view": "latest",
     "@hookform/resolvers": "^3.10.0",
-    "@mendable/firecrawl-js": "^4.3.4",
+    "@mendable/firecrawl-js": "latest",
     "@radix-ui/react-accordion": "1.2.2",
     "@radix-ui/react-alert-dialog": "1.1.4",
     "@radix-ui/react-aspect-ratio": "1.1.1",
