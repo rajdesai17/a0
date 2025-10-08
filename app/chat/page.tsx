@@ -445,9 +445,9 @@ Focus only on what's needed for this specific use case. Be concise and practical
     instructions += `\`\`\`javascript\nmodule.exports = {\n  content: ["./src/**/*.{js,ts,jsx,tsx}", "./app/**/*.{js,ts,jsx,tsx}"],\n  theme: {\n    extend: {\n      colors: {\n        // Origin UI color tokens (required for proper styling)\n        border: "hsl(var(--border))",\n        background: "hsl(var(--background))",\n        foreground: "hsl(var(--foreground))",\n        primary: {\n          DEFAULT: "hsl(var(--primary))",\n          foreground: "hsl(var(--primary-foreground))",\n        },\n        // ... other Origin UI colors\n      }\n    }\n  },\n  plugins: [],\n}\n\`\`\`\n\n`
     if (hasFetch) {
       instructions += `### Step 4: API Integration Setup\n`
-      instructions += `For components with API integration, additional setup is required:\n\n`
-      instructions += `**Environment Variables (\`.env.local\`):**\n`
-      instructions += `\`\`\`bash\n# Add your API credentials\n# Example format:\n# NEXT_PUBLIC_API_KEY=your_key_here\n# API_BASE_URL=https://api.example.com\n\`\`\`\n\n`
+      instructions += `For components with API integration, you'll need to configure environment variables in your project.\n\n`
+      instructions += `**Environment Variables Setup:**\n`
+      instructions += `Create a file named \`.env.local\` in your project root and add your API credentials there. Refer to your API provider's documentation for the specific variable names and values needed.\n\n`
       instructions += `**CORS Configuration:**\n`
       instructions += `If calling external APIs from the browser, ensure CORS is properly configured on the API server.\n\n`
     } else {
@@ -472,7 +472,7 @@ Focus only on what's needed for this specific use case. Be concise and practical
             apiDetail.analysis.authMethods.includes("API Key")
           ) {
             instructions += `**Authentication Setup Examples:**\n`
-            instructions += `\`\`\`javascript\n// Method 1: Using Authorization header\nconst headers = {\n  'Authorization': 'Bearer YOUR_TOKEN_HERE',\n  'Content-Type': 'application/json'\n}\n\n// Method 2: Using API key in header\nconst headers = {\n  'X-API-Key': 'YOUR_API_KEY_HERE',\n  'Content-Type': 'application/json'\n}\n\n// Usage in fetch\nconst response = await fetch('https://${apiDetail.domain}/api/endpoint', {\n  method: 'GET',\n  headers: headers\n})\n\`\`\`\n\n`
+            instructions += `\`\`\`javascript\n// Method 1: Using Authorization header\nconst headers = {\n  'Authorization': 'Bearer YOUR_API_TOKEN_HERE',\n  'Content-Type': 'application/json'\n}\n\n// Method 2: Using API key in header\nconst headers = {\n  'X-API-Key': 'YOUR_API_KEY_HERE',\n  'Content-Type': 'application/json'\n}\n\n// Usage in fetch\nconst response = await fetch('https://${apiDetail.domain}/api/endpoint', {\n  method: 'GET',\n  headers: headers\n})\n\`\`\`\n\n`
           }
         }
 
@@ -498,7 +498,7 @@ Focus only on what's needed for this specific use case. Be concise and practical
 
             instructions += `#### Endpoint ${idx + 1}: ${method} ${cleanEndpoint}\n\n`
             instructions += `**Quick Copy-Paste Example:**\n`
-            instructions += `\`\`\`javascript\n// ${method} ${cleanEndpoint}\nconst ${method.toLowerCase()}Data = async () => {\n  try {\n    const response = await fetch('${fullUrl}', {\n      method: '${method}',\n      headers: {\n        'Content-Type': 'application/json',\n        'Authorization': 'Bearer ' + process.env.NEXT_PUBLIC_API_KEY,\n        // Add other required headers here\n      }${method === "POST" || method === "PUT" ? ',\n      body: JSON.stringify({\n        // Add your request payload here\n        // Example: { name: "value", id: 123 }\n      })' : ""}\n    })\n    \n    if (!response.ok) {\n      throw new Error(\`HTTP error! status: \${response.status}\`)\n    }\n    \n    const data = await response.json()\n    return data\n  } catch (error) {\n    console.error('API Error:', error)\n    throw error\n  }\n}\n\`\`\`\n\n`
+            instructions += `\`\`\`javascript\n// ${method} ${cleanEndpoint}\nconst ${method.toLowerCase()}Data = async () => {\n  try {\n    const response = await fetch('${fullUrl}', {\n      method: '${method}',\n      headers: {\n        'Content-Type': 'application/json',\n        'Authorization': 'Bearer YOUR_API_TOKEN_HERE',\n        // Replace YOUR_API_TOKEN_HERE with your actual API token\n      }${method === "POST" || method === "PUT" ? ',\n      body: JSON.stringify({\n        // Add your request payload here\n        // Example: { name: "value", id: 123 }\n      })' : ""}\n    })\n    \n    if (!response.ok) {\n      throw new Error(\`HTTP error! status: \${response.status}\`)\n    }\n    \n    const data = await response.json()\n    return data\n  } catch (error) {\n    console.error('API Error:', error)\n    throw error\n  }\n}\n\`\`\`\n\n`
 
             // Add React hook usage example
             instructions += `**React Hook Integration:**\n`
@@ -537,9 +537,9 @@ Focus only on what's needed for this specific use case. Be concise and practical
 
       instructions += `### 🔧 Development vs Production Configuration\n\n`
       instructions += `**Development Environment:**\n`
-      instructions += `\`\`\`javascript\n// .env.local (for development)\nNEXT_PUBLIC_API_BASE_URL=https://dev-api.${apiEndpointsDetails[0]?.domain || "example.com"}\nNEXT_PUBLIC_API_KEY=<dev_key>\n\n// In your component\nconst API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL\nconst API_KEY = process.env.NEXT_PUBLIC_API_KEY\n\`\`\`\n\n`
+      instructions += `Create a \`.env.local\` file with your development API credentials. Use development/sandbox endpoints provided by your API service.\n\n`
       instructions += `**Production Environment:**\n`
-      instructions += `\`\`\`javascript\n// .env.production (for production)\nNEXT_PUBLIC_API_BASE_URL=https://api.${apiEndpointsDetails[0]?.domain || "example.com"}\nNEXT_PUBLIC_API_KEY=<prod_key>\n\n// Same component code works in both environments!\n\`\`\`\n\n`
+      instructions += `Create a \`.env.production\` file with your production API credentials. Use production endpoints and ensure proper security measures are in place.\n\n`
     } else if (hasFetch && !contextualAnalysis) {
       instructions += `## 🔗 API Integration Guide\n\n`
       instructions += `This component includes API integration capabilities. Here's what you need to know:\n\n`
@@ -550,10 +550,10 @@ Focus only on what's needed for this specific use case. Be concise and practical
       instructions += `4. **Error Handling:** Implement retry strategies and proper error handling\n\n`
 
       instructions += `### Basic API Integration Example\n`
-      instructions += `\`\`\`javascript\n// Complete API integration example\nconst [data, setData] = useState(null)\nconst [loading, setLoading] = useState(false)\nconst [error, setError] = useState(null)\n\nconst fetchData = async () => {\n  setLoading(true)\n  setError(null)\n  \n  try {\n    const response = await fetch('/api/your-endpoint', {\n      method: 'GET',\n      headers: {\n        'Content-Type': 'application/json',\n        'Authorization': 'Bearer ' + process.env.NEXT_PUBLIC_API_KEY\n      }\n    })\n    \n    if (!response.ok) {\n      throw new Error(\`HTTP error! status: \${response.status}\`)\n    }\n    \n    const result = await response.json()\n    setData(result)\n  } catch (error) {\n    console.error('Fetch error:', error)\n    setError(error.message)\n  } finally {\n    setLoading(false)\n  }\n}\n\n// Use in component\nuseEffect(() => {\n  fetchData()\n}, [])\n\`\`\`\n\n`
+      instructions += `\`\`\`javascript\n// Complete API integration example\nconst [data, setData] = useState(null)\nconst [loading, setLoading] = useState(false)\nconst [error, setError] = useState(null)\n\nconst fetchData = async () => {\n  setLoading(true)\n  setError(null)\n  \n  try {\n    const response = await fetch('/api/your-endpoint', {\n      method: 'GET',\n      headers: {\n        'Content-Type': 'application/json',\n        'Authorization': 'Bearer YOUR_API_TOKEN_HERE'\n        // Replace YOUR_API_TOKEN_HERE with your actual API token\n      }\n    })\n    \n    if (!response.ok) {\n      throw new Error(\`HTTP error! status: \${response.status}\`)\n    }\n    \n    const result = await response.json()\n    setData(result)\n  } catch (error) {\n    console.error('Fetch error:', error)\n    setError(error.message)\n  } finally {\n    setLoading(false)\n  }\n}\n\n// Use in component\nuseEffect(() => {\n  fetchData()\n}, [])\n\`\`\`\n\n`
 
       instructions += `### Environment Variables Setup\n`
-      instructions += `\`\`\`bash\n# .env.local\nNEXT_PUBLIC_API_URL=https://api.example.com\nNEXT_PUBLIC_API_KEY=<your_api_key>\n\`\`\`\n\n`
+      instructions += `Configure your environment variables in a \`.env.local\` file. Add the API URL and authentication credentials as specified in your API provider's documentation.\n\n`
     }
 
     instructions += `## 🎯 Customization Guide\n\n`
@@ -635,7 +635,7 @@ Focus only on what's needed for this specific use case. Be concise and practical
     instructions += `4. ⚛️ **React DevTools**: Inspect component props and state (if installed)\n\n`
 
     instructions += `**Environment Variable Debugging:**\n`
-    instructions += `\`\`\`javascript\n// Check if environment variables are loaded\nconsole.log('API Key:', process.env.NEXT_PUBLIC_API_KEY ? 'Loaded' : 'Missing')\nconsole.log('API URL:', process.env.NEXT_PUBLIC_API_URL)\n\n// In Next.js, only NEXT_PUBLIC_ variables work in browser\n// Server-side variables work in API routes and server components\n\`\`\`\n\n`
+    instructions += `\`\`\`javascript\n// Check if environment variables are loaded\nconsole.log('Environment check:', {\n  hasApiKey: !!process.env.YOUR_API_KEY_VAR,\n  hasApiUrl: !!process.env.YOUR_API_URL_VAR\n})\n\n// Note: In Next.js, only variables prefixed with NEXT_PUBLIC_\n// are available in the browser. Server-only variables work in\n// API routes and server components.\n\`\`\`\n\n`
 
     instructions += `## 📚 Additional Resources\n\n`
     instructions += `### Documentation & Learning\n`
