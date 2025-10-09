@@ -5,10 +5,25 @@ import { Badge } from "@/components/origin-ui/badge"
 import { ArrowRight, Sparkles, Eye, Github, Download, Terminal } from "lucide-react"
 import Link from "next/link"
 import Navbar from "@/components/navbar"
+import { GrainGradient } from "@paper-design/shaders-react"
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
+      <div className="fixed inset-0 -z-10">
+        <GrainGradient
+          width="100%"
+          height="100%"
+          colors={["#7300ff", "#eba8ff", "#00bfff", "#2b00ff"]}
+          colorBack="#000000"
+          softness={0.6}
+          intensity={0.4}
+          noise={0.3}
+          shape="corners"
+          speed={0.5}
+        />
+      </div>
+
       <Navbar />
 
       {/* Hero Section */}
