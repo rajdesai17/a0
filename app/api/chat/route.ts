@@ -1,5 +1,3 @@
-"use client"
-
 import { streamText } from "ai"
 import { google } from "@ai-sdk/google"
 import { browseTool } from "@/lib/tools/browseTool"
@@ -7,8 +5,8 @@ import { browseTool } from "@/lib/tools/browseTool"
 // Handle analysis requests for contextual documentation analysis
 async function handleAnalysisRequest(messages: any[]) {
   try {
-    const analysisPrompt = messages[0]?.content || ""
-
+    const analysisPrompt = messages[0]?.content || ''
+    
     const result = await streamText({
       model: google("gemini-2.5-flash"),
       messages: [
@@ -25,37 +23,38 @@ Your response should be structured markdown that includes:
 5. **KEY CONCEPTS** - Important concepts they need to understand
 6. **IMPORTANT CONSIDERATIONS** - Things to watch out for
 
-Focus on being concise and practical. Don't repeat endpoint information - only show what they actually need for their specific use case.`,
+Focus on being concise and practical. Don't repeat endpoint information - only show what they actually need for their specific use case.`
         },
         {
-          role: "user",
-          content: analysisPrompt,
-        },
-      ],
+          role: "user", 
+          content: analysisPrompt
+        }
+      ]
     })
 
-    let analysisResult = ""
+    let analysisResult = ''
     for await (const textPart of result.textStream) {
       analysisResult += textPart
     }
 
     return new Response(analysisResult, {
-      headers: { "Content-Type": "text/plain" },
+      headers: { 'Content-Type': 'text/plain' }
     })
+
   } catch (error) {
-    console.error("Analysis error:", error)
-    return new Response("Analysis failed", { status: 500 })
+    console.error('Analysis error:', error)
+    return new Response('Analysis failed', { status: 500 })
   }
 }
 
 export async function POST(req: Request) {
   try {
     const { messages, analysis } = await req.json()
-    console.log("Received messages:", messages) // Debug log
+    console.log('Received messages:', messages) // Debug log
 
     // Handle analysis requests differently
     if (analysis) {
-      console.log("Analysis request detected")
+      console.log('Analysis request detected')
       return await handleAnalysisRequest(messages)
     }
 
@@ -67,57 +66,66 @@ export async function POST(req: Request) {
         content: message.content,
       }))
 
-    console.log("Transformed messages:", aiMessages) // Debug log
+    console.log('Transformed messages:', aiMessages) // Debug log
 
     if (aiMessages.length === 0) {
-      return new Response("No valid messages provided", { status: 400 })
+      return new Response('No valid messages provided', { status: 400 })
     }
 
     // Check for URLs in the latest user message
     const latestMessage = aiMessages[aiMessages.length - 1]
     const urlRegex = /(https?:\/\/[^\s]+)/gi
     const urls = latestMessage.content.match(urlRegex) || []
-
-    let documentationContext = ""
+    
+    let documentationContext = ''
     let browsingResults = null
 
     // If URLs are detected, use browse tool to analyze them
-    if (urls.length > 0 && latestMessage.role === "user") {
-      console.log("URLs detected:", urls)
+    if (urls.length > 0 && latestMessage.role === 'user') {
+      console.log('URLs detected:', urls)
       try {
         const browsingResult = await browseTool({ urls, userRequest: latestMessage.content })
         if (browsingResult.success) {
           documentationContext = browsingResult.documentationContext
           browsingResults = browsingResult // Store for instructions generation
-          console.log("Successfully browsed URLs, context length:", documentationContext.length)
-
+          console.log('Successfully browsed URLs, context length:', documentationContext.length)
+          
           // Store results for the instructions tab - works in dev and production (Vercel)
           try {
-            const host = req.headers.get("host")
-            const protocol = host?.includes("localhost") ? "http" : "https"
-            const baseUrl = `${protocol}://${host}`
-
+            const host = req.headers.get('host')
+            let baseUrl: string
+            
+            if (process.env.NODE_ENV === 'development') {
+              // Development: use detected host with http
+              baseUrl = `http://${host || 'localhost:3001'}`
+            } else {
+              // Production: use env var or detected host or fallback to Vercel URL
+              baseUrl = process.env.NEXTAUTH_URL || 
+                       (host ? `https://${host}` : 'https://a0-ai.vercel.app')
+            }
+            
             console.log(`Storing documentation results at: ${baseUrl}/api/documentation`)
             await fetch(`${baseUrl}/api/documentation`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ urls, results: browsingResult }),
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ urls, results: browsingResult })
             })
-            console.log("Successfully stored documentation results")
+            console.log('Successfully stored documentation results')
           } catch (err) {
-            console.log("Failed to store doc results:", err)
+            console.log('Failed to store doc results:', err)
             // Continue execution even if documentation storage fails
           }
+          
         } else {
-          console.log("Browsing failed")
+          console.log('Browsing failed')
         }
       } catch (error) {
-        console.error("Error browsing URLs:", error)
+        console.error('Error browsing URLs:', error)
       }
     }
 
     // Enhanced system prompt with documentation awareness
-    const systemPrompt = documentationContext
+    const systemPrompt = documentationContext 
       ? `You are a React component generator specialized in creating beautiful components using Origin UI design patterns and Tailwind CSS.
 
 📚 **DOCUMENTATION CONTEXT:**
@@ -250,11 +258,12 @@ Remember: Only return the component code with window.default export, nothing els
       system: systemPrompt,
     })
 
-    console.log("Stream created successfully") // Debug log
+    console.log('Stream created successfully') // Debug log
     return result.toTextStreamResponse()
+    
   } catch (error) {
-    console.error("API Error:", error)
-    const errorMessage = error instanceof Error ? error.message : "Unknown error"
+    console.error('API Error:', error)
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     return new Response(`Error: ${errorMessage}`, { status: 500 })
   }
 }

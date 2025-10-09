@@ -9,18 +9,18 @@ import { GrainGradient } from "@paper-design/shaders-react"
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-background relative">
+    <div className="min-h-screen relative">
       <div className="fixed inset-0 -z-10">
         <GrainGradient
           width="100%"
           height="100%"
           colors={["#7300ff", "#eba8ff", "#00bfff", "#2b00ff"]}
           colorBack="#000000"
-          softness={0.6}
-          intensity={0.4}
-          noise={0.3}
+          softness={0.5}
+          intensity={0.5}
+          noise={0.25}
           shape="corners"
-          speed={0.5}
+          speed={1}
         />
       </div>
 
