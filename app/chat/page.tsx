@@ -1,5 +1,5 @@
 "use client"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo, useCallback, memo } from "react"
 import type React from "react"
 
 import { Button } from "@/components/origin-ui/button"
@@ -15,9 +15,27 @@ import { EditorView } from "@codemirror/view"
 import { useTheme } from "next-themes"
 import { SandboxedPreview } from "@/components/sandboxed-preview"
 import Navbar from "@/components/navbar"
+import dynamic from "next/dynamic"
 import ReactMarkdown from "react-markdown"
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
-import { oneDark as syntaxOneDark, oneLight as syntaxOneLight } from "react-syntax-highlighter/dist/esm/styles/prism"
+
+// Dynamically import syntax highlighter to reduce initial bundle size
+const SyntaxHighlighter = dynamic(
+  () => import("react-syntax-highlighter").then((mod) => mod.Prism),
+  { ssr: false }
+)
+
+// Dynamically import syntax highlighter styles
+const useSyntaxStyles = () => {
+  const [styles, setStyles] = useState<any>(null)
+
+  useEffect(() => {
+    import("react-syntax-highlighter/dist/esm/styles/prism").then((mod) => {
+      setStyles({ oneDark: mod.oneDark, oneLight: mod.oneLight })
+    })
+  }, [])
+
+  return styles
+}
 import Link from "next/link"
 import ThemeToggle from "@/components/theme-toggle"
 
@@ -35,6 +53,9 @@ export default function ChatPage() {
   const [error, setError] = useState<string | null>(null)
   const [downloadSuccess, setDownloadSuccess] = useState(false)
   const [currentUserRequest, setCurrentUserRequest] = useState("")
+
+  // Load syntax styles dynamically
+  const syntaxStyles = useSyntaxStyles()
 
   const [generatedCode, setGeneratedCode] = useState(`function WelcomeComponent() {
   return (
@@ -55,12 +76,15 @@ window.default = WelcomeComponent;`)
   const { theme } = useTheme()
   const [selectedTab, setSelectedTab] = useState("preview")
 
-  // Extract component name from code
-  const extractComponentName = (code: string): string => {
+  // Extract component name from code - memoized to avoid recalculation
+  const extractComponentName = useCallback((code: string): string => {
     const functionMatch = code.match(/function\s+(\w+)/)
     const constMatch = code.match(/const\s+(\w+)\s*=/)
     return functionMatch?.[1] || constMatch?.[1] || "Component"
-  }
+  }, [])
+
+  // Memoize computed values
+  const componentName = useMemo(() => extractComponentName(generatedCode), [generatedCode, extractComponentName])
 
   // State for documentation results
   const [documentationResults, setDocumentationResults] = useState<any>(null)
@@ -676,9 +700,8 @@ Focus only on what's needed for this specific use case. Be concise and practical
     }
   }, [generatedCode, currentUserRequest])
 
-  // Download component as file
-  const downloadComponent = () => {
-    const componentName = extractComponentName(generatedCode)
+  // Download component as file - memoized with useCallback
+  const downloadComponent = useCallback(() => {
     const filename = `${componentName.replace(/[^a-zA-Z0-9]/g, "")}.tsx`
 
     const fileContent = `// ${componentName} Component
@@ -706,9 +729,9 @@ export default ${componentName}
     // Show success feedback
     setDownloadSuccess(true)
     setTimeout(() => setDownloadSuccess(false), 2000)
-  }
+  }, [generatedCode, componentName])
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault()
     if (!input.trim()) return
 
@@ -830,7 +853,7 @@ export default ${componentName}
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [input, messages, extractComponentName])
 
   return (
     <div className="h-screen flex flex-col bg-background overflow-hidden">
@@ -988,7 +1011,7 @@ export default ${componentName}
               <div className="flex items-center px-4 py-2 bg-muted/30 border-b border-border">
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="font-mono">{extractComponentName(generatedCode)}.tsx</span>
+                  <span className="font-mono">{componentName}.tsx</span>
                 </div>
               </div>
               <div className="h-full overflow-y-auto scrollbar-hide">
@@ -1044,8 +1067,8 @@ export default ${componentName}
 
                         return (
                           <div className="mb-4 mt-2">
-                            <SyntaxHighlighter
-                              style={theme === "dark" ? syntaxOneDark : syntaxOneLight}
+                            {syntaxStyles && <SyntaxHighlighter
+                              style={theme === "dark" ? syntaxStyles.oneDark : syntaxStyles.oneLight}
                               language={language}
                               customStyle={{
                                 margin: 0,
@@ -1058,7 +1081,7 @@ export default ${componentName}
                               {...props}
                             >
                               {String(child?.props?.children || "").replace(/\n$/, "")}
-                            </SyntaxHighlighter>
+                            </SyntaxHighlighter>}
                           </div>
                         )
                       },
