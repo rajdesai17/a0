@@ -89,33 +89,38 @@ export async function POST(req: Request) {
           documentationContext = browsingResult.documentationContext
           browsingResults = browsingResult // Store for instructions generation
           console.log('Successfully browsed URLs, context length:', documentationContext.length)
-          
-          // Store results for the instructions tab - works in dev and production (Vercel)
-          try {
-            const host = req.headers.get('host')
-            let baseUrl: string
-            
-            if (process.env.NODE_ENV === 'development') {
-              // Development: use detected host with http
-              baseUrl = `http://${host || 'localhost:3001'}`
-            } else {
-              // Production: use env var or detected host or fallback to Vercel URL
-              baseUrl = process.env.NEXTAUTH_URL || 
-                       (host ? `https://${host}` : 'https://a0-ai.vercel.app')
+
+          // Store results for the instructions tab asynchronously (don't await)
+          // This allows the response to stream while documentation is being stored
+          const storeDocumentation = async () => {
+            try {
+              const host = req.headers.get('host')
+              let baseUrl: string
+
+              if (process.env.NODE_ENV === 'development') {
+                // Development: use detected host with http
+                baseUrl = `http://${host || 'localhost:3001'}`
+              } else {
+                // Production: use env var or detected host or fallback to Vercel URL
+                baseUrl = process.env.NEXTAUTH_URL ||
+                         (host ? `https://${host}` : 'https://a0-ai.vercel.app')
+              }
+
+              console.log(`Storing documentation results at: ${baseUrl}/api/documentation`)
+              await fetch(`${baseUrl}/api/documentation`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ urls, results: browsingResult })
+              })
+              console.log('Successfully stored documentation results')
+            } catch (err) {
+              console.log('Failed to store doc results:', err)
             }
-            
-            console.log(`Storing documentation results at: ${baseUrl}/api/documentation`)
-            await fetch(`${baseUrl}/api/documentation`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ urls, results: browsingResult })
-            })
-            console.log('Successfully stored documentation results')
-          } catch (err) {
-            console.log('Failed to store doc results:', err)
-            // Continue execution even if documentation storage fails
           }
-          
+
+          // Fire and forget - don't block the response
+          storeDocumentation()
+
         } else {
           console.log('Browsing failed')
         }

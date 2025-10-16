@@ -2,9 +2,53 @@
 import FirecrawlApp from '@mendable/firecrawl-js'
 
 // Initialize Firecrawl client if API key is available
-const firecrawlClient = process.env.FIRECRAWL_API_KEY 
+const firecrawlClient = process.env.FIRECRAWL_API_KEY
   ? new FirecrawlApp({ apiKey: process.env.FIRECRAWL_API_KEY })
   : null
+
+// In-memory cache for scraping results with TTL (Time To Live)
+interface CacheEntry {
+  data: ScrapeResult
+  timestamp: number
+}
+
+const scrapeCache = new Map<string, CacheEntry>()
+const CACHE_TTL = 60 * 60 * 1000 // 1 hour in milliseconds
+
+// Function to get cached data if available and not expired
+function getCachedScrape(url: string): ScrapeResult | null {
+  const cached = scrapeCache.get(url)
+  if (!cached) return null
+
+  const now = Date.now()
+  if (now - cached.timestamp > CACHE_TTL) {
+    // Cache expired, remove it
+    scrapeCache.delete(url)
+    return null
+  }
+
+  console.log('Using cached scrape data for:', url)
+  return cached.data
+}
+
+// Function to cache scrape results
+function cacheScrapeResult(url: string, data: ScrapeResult): void {
+  scrapeCache.set(url, {
+    data,
+    timestamp: Date.now()
+  })
+
+  // Cleanup old cache entries periodically (keep only last 100 entries)
+  if (scrapeCache.size > 100) {
+    const sortedEntries = Array.from(scrapeCache.entries())
+      .sort((a, b) => a[1].timestamp - b[1].timestamp)
+
+    // Remove oldest 20 entries
+    for (let i = 0; i < 20; i++) {
+      scrapeCache.delete(sortedEntries[i][0])
+    }
+  }
+}
 
 export interface ScrapeResult {
   url: string
@@ -95,6 +139,12 @@ export async function crawlUrl(url: string, options: {
 export async function scrapeUrl(url: string): Promise<ScrapeResult> {
   console.log('Scraping URL:', url)
 
+  // Check cache first
+  const cachedResult = getCachedScrape(url)
+  if (cachedResult) {
+    return cachedResult
+  }
+
   // Validate URL
   try {
     new URL(url)
@@ -113,26 +163,30 @@ export async function scrapeUrl(url: string): Promise<ScrapeResult> {
 
       if (result) {
         console.log('Firecrawl scraping successful')
-        
+
         // Extract content and metadata - Firecrawl returns direct properties
         const content = (result as any).markdown || (result as any).content || ''
         const title = (result as any).metadata?.title || new URL(url).hostname
-        
+
         // Extract API endpoints from the scraped content
         const apiEndpoints = extractApiEndpoints(content)
-        
+
         // Extract code examples
         const codeExamples = extractCodeExamples(content)
 
-        return {
+        const scrapeResult = {
           url,
           title: title.trim(),
           content: content.trim(),
           apiEndpoints,
           codeExamples,
           wordCount: content.split(' ').length,
-          scrapedWith: 'firecrawl'
+          scrapedWith: 'firecrawl' as const
         }
+
+        // Cache the result
+        cacheScrapeResult(url, scrapeResult)
+        return scrapeResult
       }
     } catch (error) {
       console.warn('Firecrawl scraping failed, falling back to fetch:', error)
@@ -188,9 +242,9 @@ function extractCodeExamples(content: string): string[] {
 // Original fetch-based scraping as fallback
 async function fallbackScrapeUrl(url: string): Promise<ScrapeResult> {
 
-  // Create AbortController for timeout
+  // Create AbortController for timeout - reduced from 15s to 10s for better performance
   const controller = new AbortController()
-  const timeoutId = setTimeout(() => controller.abort(), 15000) // 15 second timeout
+  const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 second timeout
 
   try {
     const response = await fetch(url, {
@@ -262,15 +316,19 @@ async function fallbackScrapeUrl(url: string): Promise<ScrapeResult> {
       codeExamples.push(...matches.slice(0, 5))
     })
 
-    return {
+    const result = {
       url,
       title,
       content: cleanContent,
       apiEndpoints: uniqueEndpoints,
       codeExamples,
       wordCount: cleanContent.split(' ').length,
-      scrapedWith: 'fetch'
+      scrapedWith: 'fetch' as const
     }
+
+    // Cache the result
+    cacheScrapeResult(url, result)
+    return result
 
   } catch (error) {
     clearTimeout(timeoutId)

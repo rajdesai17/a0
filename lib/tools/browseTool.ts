@@ -219,48 +219,50 @@ export async function browseTool({ urls, focus, userRequest }: { urls: string[],
   const relevantTopics = extractRelevantTopics(userRequest || '')
   console.log(`Identified relevant topics:`, relevantTopics)
 
-  const results = []
+  // Parallelize URL scraping for better performance
+  const scrapingPromises = urls.slice(0, 3).map(async (url) => {
+    try {
+      console.log(`Smart scraping: ${url} focused on: ${relevantTopics.join(', ')}`)
 
-    for (const url of urls.slice(0, 3)) { // Limit to 3 URLs to avoid timeouts
-      try {
-        console.log(`Smart scraping: ${url} focused on: ${relevantTopics.join(', ')}`)
-        
-        // Use targeted crawling options based on user request
-        const crawlOptions = getSmartCrawlOptions(url, userRequest || '', relevantTopics)
-        
-        // Use the shared scraping utility with smart options
-        const scrapedData = await smartScrapeUrlWithContext(url, crawlOptions)
-        
-        // Filter content to focus on relevant sections
-        const filteredContent = filterRelevantContent(scrapedData.content, relevantTopics, userRequest || '')
-        
-        // Analyze the filtered content for API-specific information
-        const analysis = analyzeDocumentation(filteredContent, scrapedData.apiEndpoints, focus || userRequest)
-        
-        results.push({
-          url,
-          title: scrapedData.title,
-          content: filteredContent,
-          originalWordCount: scrapedData.wordCount,
-          filteredWordCount: filteredContent.split(' ').length,
-          apiEndpoints: scrapedData.apiEndpoints,
-          codeExamples: scrapedData.codeExamples,
-          analysis,
-          relevantTopics,
-          success: true,
-        })
+      // Use targeted crawling options based on user request
+      const crawlOptions = getSmartCrawlOptions(url, userRequest || '', relevantTopics)
 
-        console.log(`Successfully scraped: ${url} (${scrapedData.wordCount} -> ${filteredContent.split(' ').length} words after filtering)`)
-        
-      } catch (error) {
-        console.error(`Error scraping ${url}:`, error)
-        results.push({
-          url,
-          error: `Scraping failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
-          success: false,
-        })
+      // Use the shared scraping utility with smart options
+      const scrapedData = await smartScrapeUrlWithContext(url, crawlOptions)
+
+      // Filter content to focus on relevant sections
+      const filteredContent = filterRelevantContent(scrapedData.content, relevantTopics, userRequest || '')
+
+      // Analyze the filtered content for API-specific information
+      const analysis = analyzeDocumentation(filteredContent, scrapedData.apiEndpoints, focus || userRequest)
+
+      console.log(`Successfully scraped: ${url} (${scrapedData.wordCount} -> ${filteredContent.split(' ').length} words after filtering)`)
+
+      return {
+        url,
+        title: scrapedData.title,
+        content: filteredContent,
+        originalWordCount: scrapedData.wordCount,
+        filteredWordCount: filteredContent.split(' ').length,
+        apiEndpoints: scrapedData.apiEndpoints,
+        codeExamples: scrapedData.codeExamples,
+        analysis,
+        relevantTopics,
+        success: true,
       }
-    }  const successful = results.filter(r => r.success)
+    } catch (error) {
+      console.error(`Error scraping ${url}:`, error)
+      return {
+        url,
+        error: `Scraping failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        success: false,
+      }
+    }
+  })
+
+  // Wait for all scraping operations to complete in parallel
+  const results = await Promise.all(scrapingPromises)
+  const successful = results.filter(r => r.success)
 
   // Generate summary
   const summary = {
